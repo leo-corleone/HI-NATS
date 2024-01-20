@@ -1,30 +1,25 @@
 <template>
   <div id="app">
-     <Client/>
+     <Header/>
+     <Dashboard/>
   </div>
 </template>
 
 <script>
-import Client from "@/components/Client.vue";
+import Header from "@/components/Header.vue";
+import Dashboard from "@/components/Dashboard.vue";
 export default {
   name: 'App',
   components: {
-     Client
+     Header,
+     Dashboard
   }
 }
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+
 }
 
-body{
-  background-color: aliceblue;
-}
 </style>

@@ -1,8 +1,9 @@
 import axios from "axios";
 
 export class Api {
-    constructor(scheme) {
-        this.scheme = scheme;
+    constructor(schema) {
+        console.log('schema' , schema)
+        this.schema = schema;
     }
 
     get = async (url, params) => {
@@ -13,6 +14,5 @@ export class Api {
         }).then(response => response.data)
             .catch(err => err);
     }
-
 
 }
