@@ -27,13 +27,14 @@ export default {
     },
     connectionListener(status) {
       this.status = status;
+      console.log(status)
     },
     errorListener(err) {
-      console.log(err)
+      console.log(err.message)
     },
   },
   mounted() {
-
+    this.connect();
   },
   beforeDestroy() {
     this.mq.close();

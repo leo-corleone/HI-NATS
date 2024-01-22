@@ -1,4 +1,4 @@
-import {connect, JSONCodec, StringCodec} from "nats";
+import {connect, JSONCodec, StringCodec} from "nats.ws";
 
 
 class MessageQueue {
@@ -21,12 +21,8 @@ class MessageQueue {
             reconnectTimeWait: 3000,
             waitOnFirstConnect: false,
             noAsyncTraces: true
-        },).then(data => data)
-            .catch(err => {
-                if (config.errorListener) {
-                    config.errorListener(err)
-                }
-            });
+         }).then(data => data)
+            .catch(err => config.errorListener && config.errorListener(err));
 
         if (this.nc && config.connectionListener) {
             (async () => {
@@ -71,9 +67,9 @@ class MessageQueue {
     }
 
 
-    req = (topic, data) => {
+    req = async (topic, data) => {
         if (this.nc) {
-            this.nc.request(topic, data, {
+           return await this.nc.request(topic, data, {
                 timeout: 10 * 1000,
                 noMux: true
             }).then(msg => this.decode(msg.data)
