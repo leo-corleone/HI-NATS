@@ -16,7 +16,7 @@ export default {
 <style scoped>
   .header-warp{
     border-bottom: #d7d3d3 1px solid;
-    height: 35px;
+    height: 5%;
     box-shadow: 0 3px 2px -2px  #d7d3d3;
   }
   .header-warp div{
