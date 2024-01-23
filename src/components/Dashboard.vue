@@ -27,6 +27,7 @@ export default {
   .dashboard{
     background-color: aqua;
     width: 80%;
+    height: 90%;
     margin: 5px auto 0 auto;
   }
 </style>

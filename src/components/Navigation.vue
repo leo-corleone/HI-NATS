@@ -1,8 +1,6 @@
 <template>
 
-    <el-menu  background-color="#545c64"
-              text-color="#fff"
-              active-text-color="#fff" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
+    <el-menu active-text-color="rgb(6 223 82)" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
       <el-menu-item  index="0">
         <i><img width="30px" src="../assets/logo.png"></i>
       </el-menu-item>
@@ -31,8 +29,8 @@ export default {
     };
   },
   methods: {
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath ,'12312');
+    handleOpen() {
+      this.$notify.success('HI')
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath);
@@ -52,6 +50,7 @@ export default {
 
 .el-menu{
   border-right: rgb(6 223 82);
+  height: 100%;
 }
 
 .el-menu-item{
