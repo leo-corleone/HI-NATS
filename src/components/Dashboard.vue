@@ -1,20 +1,15 @@
 <template>
   <div class="dashboard">
-    host:<input type="text" v-model="host"> <br/>
-    port:<input type="text" v-model="port"> <br/><br/>
-    <button @click="addClient">点击添加客户端</button>
-    <Client v-for="config in configs" :config="config" :key="config.id"/>
+    <Navigation/>
   </div>
 </template>
 
 <script>
-import Client from "@/components/Client.vue";
-import {nanoid} from "nanoid";
-
+import Navigation from "@/components/Navigation.vue";
 export default {
   name: "Dashboard",
   components:{
-    Client
+   Navigation
   },
   data(){
     return {
@@ -24,23 +19,14 @@ export default {
     }
   },
   methods:{
-    addClient(){
-      if (this.host == null || this.port == null){
-        return
-      }
-      let config = {
-        id:nanoid(),
-        host:this.host,
-        port:this.port,
-      }
-      this.configs.push(config);
-    }
   }
 }
 </script>
 
 <style scoped>
   .dashboard{
-    text-align: center;
+    background-color: aqua;
+    width: 80%;
+    margin: 5px auto 0 auto;
   }
 </style>
