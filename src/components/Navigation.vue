@@ -1,21 +1,20 @@
 <template>
-
   <el-menu active-text-color="rgb(6 223 82)"
            background-color="#545c64"
-           text-color="#fff" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
+           text-color="#fff" class="el-menu-vertical-demo"
            :collapse="isCollapse">
     <el-menu-item index="0" @click="switchCollapse">
       <i><img width="30px" src="../assets/logo.png"></i>
     </el-menu-item>
-    <el-menu-item index="1" @click="handleOpen">
+    <el-menu-item index="1" @click="clickNavMenu">
       <i class="el-icon-connection"></i>
       <span slot="title">连接</span>
     </el-menu-item>
-    <el-menu-item index="2" @click="handleOpen">
+    <el-menu-item index="2" @click="clickNavMenu">
       <i class="el-icon-monitor"></i>
       <span slot="title">监控</span>
     </el-menu-item>
-    <el-menu-item index="3" @click="handleOpen">
+    <el-menu-item index="3" @click="clickNavMenu">
       <i class="el-icon-notebook-2"></i>
       <span slot="title">日志</span>
     </el-menu-item>
@@ -32,11 +31,9 @@ export default {
     };
   },
   methods: {
-    handleOpen() {
-      this.$notify.success('HI')
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath);
+    async clickNavMenu() {
+       const result = await this.$confirm('?');
+       console.log(result)
     },
     switchCollapse(){
        this.isCollapse = !this.isCollapse
@@ -56,12 +53,8 @@ export default {
 
 .el-menu {
   border-right: #f5d922 1px solid;
-  height: 94%;
+  height: 100%;
   line-height: 94%;
 }
 
-/*.el-menu-item {*/
-/*  height: 25%;*/
-/*  line-height: 25%;*/
-/*}*/
 </style>

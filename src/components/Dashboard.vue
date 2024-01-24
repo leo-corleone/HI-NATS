@@ -1,6 +1,8 @@
 <template>
-  <div class="dashboard">
-    <Navigation/>
+  <div class="dashboard-wrap">
+    <div class="dashboard-wrap-inner">
+      <Navigation/>
+    </div>
   </div>
 </template>
 
@@ -10,23 +12,19 @@ export default {
   name: "Dashboard",
   components:{
    Navigation
-  },
-  data(){
-    return {
-      host: null,
-      port: null,
-      configs:[]
-    }
-  },
-  methods:{
   }
 }
 </script>
 
 <style scoped>
-  .dashboard{
+  .dashboard-wrap{
+    width: 100%;
+    height: 94.5%;
+  }
+
+  .dashboard-wrap-inner{
     width: 80%;
-    height: 90%;
-    margin: 5px auto 0 auto;
+    height: 100%;
+    margin: 0 auto;
   }
 </style>
