@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     async clickNavMenu() {
-       const result = await this.$confirm('?');
+       const result = await this.$confirm('xlsx' ).then(confirm => confirm).catch(err => err);
        console.log(result)
     },
     switchCollapse(){
