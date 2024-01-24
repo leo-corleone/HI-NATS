@@ -18,6 +18,7 @@ export default {
   methods:{
   },
   mounted() {
+    console.log('Welcome to HI NATS')
     console.log(this)
   }
 }

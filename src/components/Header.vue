@@ -11,7 +11,12 @@
 
 <script>
 export default {
-  name: "Header"
+  name: "Header",
+  mounted() {
+    this.$bus.$on('click' , (result)=>{
+      console.log(result)
+    })
+  }
 }
 </script>
 
@@ -24,7 +29,7 @@ export default {
 
   .header-warp-outer{
      position: relative;
-     top: 10px;
+     top: 15%;
   }
 
   .header-warp div{
@@ -40,7 +45,7 @@ export default {
   }
   .header-warp-title{
     color: black;
-    font-family: "华文仿宋";
+    font-family: "Times New Roman";
     font-weight: bold;
     line-height: 25px;
     height: 25px;

@@ -33,14 +33,14 @@ export default {
   methods: {
     async clickNavMenu() {
        const result = await this.$confirm('xlsx' ).then(confirm => confirm).catch(err => err);
-       console.log(result)
+       this.$bus.$emit('click' ,result)
     },
     switchCollapse(){
        this.isCollapse = !this.isCollapse
     }
   },
   mounted() {
-    console.log(this)
+    // console.log(this)
   }
 }
 </script>
@@ -54,7 +54,7 @@ export default {
 .el-menu {
   border-right: #f5d922 1px solid;
   height: 100%;
-  line-height: 94%;
+  line-height: 95%;
 }
 
 </style>
