@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import Navigation from "@/components/Navigation.vue";
+import Navigation from "@/components/main/Navigation.vue";
 export default {
   name: "Dashboard",
   components:{

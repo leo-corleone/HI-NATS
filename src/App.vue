@@ -7,18 +7,13 @@
 
 <script>
 import Header from "@/components/Header.vue";
-import Dashboard from "@/components/Dashboard.vue";
+import Dashboard from "@/components/main/Dashboard.vue";
 
 export default {
   name: 'App',
   components: {
     Header,
     Dashboard
-  },
-  methods:{
-  },
-  mounted() {
-    console.log(this)
   }
 }
 </script>
