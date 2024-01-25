@@ -9,5 +9,8 @@ Vue.use(ElementUI)
 
 new Vue({
   render: h => h(App),
-  router
+  router,
+  beforeCreate() {
+    Vue.prototype.$bus = this;
+  }
 }).$mount('#app')
