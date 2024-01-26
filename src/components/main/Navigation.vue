@@ -9,15 +9,15 @@
           <el-menu-item index="0" @click="switchCollapse">
             <i><img width="30px" src="../../assets/logo.png"></i>
           </el-menu-item>
-          <el-menu-item index="1" @click="switchCtrlPanel('/control-panel')">
+          <el-menu-item index="1" @click="switchCtrlPanel('controlPanel')">
             <i class="el-icon-connection"></i>
             <span slot="title">连接</span>
           </el-menu-item>
-          <el-menu-item index="2" @click="switchCtrlPanel('/monitor-panel')">
+          <el-menu-item index="2" @click="switchCtrlPanel('monitorPanel')">
             <i class="el-icon-monitor"></i>
             <span slot="title">监控</span>
           </el-menu-item>
-          <el-menu-item index="3" @click="switchCtrlPanel('/log-panel')">
+          <el-menu-item index="3" @click="switchCtrlPanel('logPanel')">
             <i class="el-icon-notebook-2"></i>
             <span slot="title">日志</span>
           </el-menu-item>
@@ -41,8 +41,8 @@ export default {
     };
   },
   methods: {
-    switchCtrlPanel(path) {
-      this.$router.push({path})
+    switchCtrlPanel(name) {
+      this.$router.push({name})
     },
     switchCollapse() {
       this.isCollapse = !this.isCollapse

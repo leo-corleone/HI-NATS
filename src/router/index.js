@@ -19,7 +19,7 @@ VueRouter.prototype.replace = function (location) {
 }
 
 const router = new VueRouter({
-    mode: 'history',
+    mode: 'hash',
     routes: [
         {
             name: 'client',
@@ -28,17 +28,17 @@ const router = new VueRouter({
         },
         {
             name: "controlPanel",
-            path: '/control-panel',
+            path: '/controlPanel',
             component: ControlPanel,
         },
         {
             name: "monitorPanel",
-            path: '/monitor-panel',
+            path: '/monitorPanel',
             component: MonitorPanel,
         },
         {
             name: "logPanel",
-            path: '/log-panel',
+            path: '/logPanel',
             component: LogPanel,
         }
     ]

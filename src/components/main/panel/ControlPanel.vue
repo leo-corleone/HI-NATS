@@ -1,25 +1,10 @@
 <template>
  <div class="ctrl-panel-wrap">
-   <el-dialog title="新增连接" width="30%" :fullscreen="false" custom-class="ctrl-panel-dialog" :close-on-click-modal="false" center :visible.sync="popConnectDialog">
-     <el-form :model="connection" label-width="100px" style="height: 200px; text-align: center" :rules="rules">
-       <el-form-item label="连接名称" prop="name">
-         <el-input clearable
-                   size="mini" prefix-icon="el-icon-user" placeholder="请输入...." v-model="connection.name"></el-input>
-       </el-form-item>
-       <el-form-item label="连接名称" prop="name">
-         <el-input clearable
-                   size="mini" v-model="connection.host"></el-input>
-       </el-form-item>
-       <el-form-item label="连接名称" prop="name">
-         <el-input clearable
-                   size="mini" v-model="connection.port"></el-input>
-       </el-form-item>
-     </el-form>
-   </el-dialog>
-
+   <ConnectionDialog ref="connectDialog"></ConnectionDialog>
    <div class="ctrl-panel-left">
      <div class="ctrl-panel-tool">
        <el-input
+           prefix-icon="el-icon-search"
            placeholder="请输入内容"
            v-model="searchKey"
            clearable
@@ -28,7 +13,7 @@
            :disabled="inputDisabled"
        >
        </el-input>
-       <el-button @click="popConnectDialog = true" size="mini" icon="el-icon-plus" type="primary" circle></el-button>
+       <el-button @click="toggleConnectionDialog" size="mini" icon="el-icon-plus" type="primary" circle></el-button>
      </div>
    </div>
    <div class="ctrl-panel-right">
@@ -38,34 +23,34 @@
 </template>
 
 <script>
-// import Connection from "@/components/main/panel/control/Connection.vue";
+import ConnectionDialog from "@/components/dialog/ConnectionDialog.vue";
+
 export default {
   name: "ControlPanel",
   components:{
-    // Connection
+    ConnectionDialog
   },
   data(){
     return {
       searchKey:'',
       connections:[],
-      connection:{
-        id: null,
-        connectionName: null,
-        host: null,
-        port: null,
-      },
-      rules:{
-
-      },
-      formLabelWidth: '120px',
-      popConnectDialog: false,
+      isPop: false,
     }
   },
   methods:{
+    toggleConnectionDialog() {
+      this.$refs.connectDialog.isPop = !this.$refs.connectDialog.isPop;
+    },
+    addConnectionClient(connection){
+      console.log(connection);
+    }
+  },
+  mounted() {
+    console.log(this)
   },
   computed: {
     inputDisabled(){
-      return this.connections.length === 0
+      return false
     }
   }
 }
@@ -101,13 +86,9 @@ export default {
   }
 
   .ctrl-panel-tool .ctrl-panel-tool-input{
-    width: 75%;
-    margin: auto;
-    padding: 0 10px;
-  }
-
-  /deep/ .ctrl-panel-dialog{
-    border-radius: 22px;
+    width: 70%;
+    margin: 0 10px;
+    /*padding: 0 10px;*/
   }
 
 </style>
