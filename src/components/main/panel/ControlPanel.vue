@@ -24,6 +24,7 @@
 
 <script>
 import ConnectionDialog from "@/components/dialog/ConnectionDialog.vue";
+import {EventConstant} from "@/busEvent/EventConstant";
 
 export default {
   name: "ControlPanel",
@@ -46,6 +47,7 @@ export default {
     }
   },
   mounted() {
+    this.$bus.$on(EventConstant.ADD_CONNECTION_CLIENT , this.addConnectionClient)
     console.log(this)
   },
   computed: {

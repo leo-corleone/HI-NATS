@@ -12,7 +12,7 @@ export default {
 
 <style scoped>
   .log-panel-wrap{
-    wwidth: auto;
+    width: auto;
     height: 100%;
   }
 </style>

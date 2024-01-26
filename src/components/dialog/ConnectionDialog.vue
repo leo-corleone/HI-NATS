@@ -24,6 +24,7 @@
 </template>
 
 <script>
+
 export default {
   name: "ConnectionDialog",
   data() {
@@ -32,15 +33,16 @@ export default {
         name: null,
         host: null,
         port: null,
-        username:null,
-        password:null,
+        username: null,
+        password: null,
         token: null,
-
       },
       isPop: false,
     }
   },
+  mounted() {
 
+  }
 }
 </script>
 

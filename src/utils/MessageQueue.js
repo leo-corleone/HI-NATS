@@ -20,10 +20,13 @@ class MessageQueue {
             name: config.name,
             reconnectTimeWait: 3000,
             waitOnFirstConnect: false,
-            noAsyncTraces: true
+            noAsyncTraces: true,
+            token: config.token,
+            user: config.user,
+            pass: config.pass,
+            noEcho: config.noEcho,
          }).then(data => data)
             .catch(err => config.errorListener && config.errorListener(err));
-
         if (this.nc && config.connectionListener) {
             (async () => {
                 for await (const s of this.nc.status()) {
@@ -100,3 +103,4 @@ class MessageQueue {
 }
 
 export default MessageQueue;
+
