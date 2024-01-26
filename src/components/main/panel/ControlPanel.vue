@@ -13,7 +13,7 @@
            :disabled="inputDisabled"
        >
        </el-input>
-       <el-button @click="toggleConnectionDialog" size="mini" icon="el-icon-plus" type="primary" circle></el-button>
+       <el-button @click="openConnectionDialog" size="mini" icon="el-icon-plus" type="primary" circle></el-button>
      </div>
    </div>
    <div class="ctrl-panel-right">
@@ -25,6 +25,7 @@
 <script>
 import ConnectionDialog from "@/components/dialog/ConnectionDialog.vue";
 import {EventConstant} from "@/busEvent/EventConstant";
+import MessageQueue from "@/utils/MessageQueue";
 
 export default {
   name: "ControlPanel",
@@ -35,20 +36,30 @@ export default {
     return {
       searchKey:'',
       connections:[],
-      isPop: false,
     }
   },
   methods:{
-    toggleConnectionDialog() {
-      this.$refs.connectDialog.isPop = !this.$refs.connectDialog.isPop;
+    openConnectionDialog() {
+      this.$refs.connectDialog.isPop = true;
     },
-    addConnectionClient(connection){
-      console.log(connection);
+    addConnectionClient(config){
+      console.log(config);
+    },
+    testConnect(config){
+       const mq = new MessageQueue();
+       mq.conn(config).then(nc => {
+         if (nc instanceof Error){
+           this.$notify.error({title:'连接失败' , message:nc.message})
+         }else {
+           this.$notify.success('连接成功')
+           nc.close();
+         }
+       });
     }
   },
   mounted() {
     this.$bus.$on(EventConstant.ADD_CONNECTION_CLIENT , this.addConnectionClient)
-    console.log(this)
+    this.$bus.$on(EventConstant.TEST_CONNECTION_CLIENT , this.testConnect)
   },
   computed: {
     inputDisabled(){

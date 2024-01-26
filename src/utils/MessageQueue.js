@@ -26,7 +26,13 @@ class MessageQueue {
             pass: config.pass,
             noEcho: config.noEcho,
          }).then(data => data)
-            .catch(err => config.errorListener && config.errorListener(err));
+           .catch(err => {
+               if (config.errorListener){
+                   config.errorListener && config.errorListener(err)
+               }else {
+                   return err;
+               }
+           });
         if (this.nc && config.connectionListener) {
             (async () => {
                 for await (const s of this.nc.status()) {
@@ -34,6 +40,7 @@ class MessageQueue {
                 }
             })().then();
         }
+        return this.nc;
     }
 
     sub = (topic, fun) => {
@@ -99,6 +106,10 @@ class MessageQueue {
         if (this.nc) {
             await this.nc.close();
         }
+    }
+
+    isActive =  () => {
+       return this.nc ? this.nc.protocol.connected : false;
     }
 }
 

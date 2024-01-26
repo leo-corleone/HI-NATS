@@ -47,6 +47,9 @@ export default {
     switchCollapse() {
       this.isCollapse = !this.isCollapse
     }
+  },
+  mounted() {
+
   }
 }
 </script>
