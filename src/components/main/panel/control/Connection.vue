@@ -73,7 +73,7 @@ export default {
       console.log(this);
     },
     connectionListener(status) {
-      console.log('xxxxxxxxx' , status);
+      console.log('xxxxxxxxx' , JSON.stringify(status));
     },
   },
   computed: {
