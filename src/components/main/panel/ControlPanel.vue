@@ -7,13 +7,17 @@
            prefix-icon="el-icon-search"
            placeholder="请输入内容"
            v-model="searchKey"
+           @input="searchConnection"
            clearable
            size="mini"
            class="ctrl-panel-tool-input"
            :disabled="inputDisabled"
        >
        </el-input>
-       <el-button @click="openConnectionDialog" size="mini" icon="el-icon-plus" type="primary" circle></el-button>
+       <el-button @click="openConnectionDialog" size="mini" icon="el-icon-plus" type="primary" round></el-button>
+     </div>
+     <div class="ctrl-panel-left-bottom">
+       <Connection v-for="connection in connections" :config="connection" :key="connection.id"/>
      </div>
    </div>
    <div class="ctrl-panel-right">
@@ -26,16 +30,19 @@
 import ConnectionDialog from "@/components/dialog/ConnectionDialog.vue";
 import {EventConstant} from "@/busEvent/EventConstant";
 import MessageQueue from "@/utils/MessageQueue";
+import Connection from "@/components/main/panel/control/Connection.vue";
 
 export default {
   name: "ControlPanel",
   components:{
+    Connection,
     ConnectionDialog
   },
   data(){
     return {
       searchKey:'',
       connections:[],
+      cacheConnections:JSON.parse(localStorage.getItem('connections')) || [],
     }
   },
   methods:{
@@ -43,27 +50,51 @@ export default {
       this.$refs.connectDialog.isPop = true;
     },
     addConnectionClient(config){
-      console.log(config);
+      this.cacheConnections.push(config);
     },
-    testConnect(config){
+    connectionTest(config , callback){
        const mq = new MessageQueue();
        mq.conn(config).then(nc => {
          if (nc instanceof Error){
+           console.log(nc)
            this.$notify.error({title:'连接失败' , message:nc.message})
          }else {
            this.$notify.success('连接成功')
            nc.close();
          }
+         callback();
        });
+    },
+    updateConnectionData(){
+      if (this.searchKey === null || this.searchKey === ''){
+        this.connections = this.cacheConnections;
+      }else {
+        this.connections = this.cacheConnections.filter(connection => {
+          return connection.name.indexOf(this.searchKey) !== -1 || connection.host.indexOf(this.searchKey) !== -1
+        })
+      }
+    },
+    searchConnection(){
+      this.updateConnectionData();
     }
   },
   mounted() {
     this.$bus.$on(EventConstant.ADD_CONNECTION_CLIENT , this.addConnectionClient)
-    this.$bus.$on(EventConstant.TEST_CONNECTION_CLIENT , this.testConnect)
+    this.$bus.$on(EventConstant.TEST_CONNECTION_CLIENT , this.connectionTest)
   },
   computed: {
     inputDisabled(){
-      return false
+      return this.cacheConnections.length === 0
+    }
+  },
+  watch:{
+    cacheConnections:{
+      deep:true,
+      immediate:true,
+      handler(value){
+        this.updateConnectionData();
+        localStorage.setItem('connections' , JSON.stringify(value));
+      }
     }
   }
 }
@@ -100,8 +131,17 @@ export default {
 
   .ctrl-panel-tool .ctrl-panel-tool-input{
     width: 70%;
-    margin: 0 10px;
+    margin: 0 5px 0 2px;
     /*padding: 0 10px;*/
   }
 
+  .ctrl-panel-left-bottom{
+    width: 100%;
+    height: auto;
+    padding: 5px 0px;
+  }
+
+  .ctrl-panel-left-bottom > div{
+    margin-bottom: 1px;
+  }
 </style>

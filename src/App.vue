@@ -29,4 +29,10 @@ html ,body{
   height: 100%;
   margin: 0;
 }
+
+.ellipsis {
+  white-space: nowrap; /* 不换行 */
+  overflow: hidden; /* 超出部分隐藏 */
+  text-overflow: ellipsis; /* 溢出部分显示省略号 */
+}
 </style>

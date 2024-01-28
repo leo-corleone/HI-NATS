@@ -22,8 +22,8 @@ class MessageQueue {
             waitOnFirstConnect: false,
             noAsyncTraces: true,
             token: config.token,
-            user: config.user,
-            pass: config.pass,
+            user: config.username,
+            pass: config.password,
             noEcho: config.noEcho,
          }).then(data => data)
            .catch(err => {
@@ -33,7 +33,10 @@ class MessageQueue {
                    return err;
                }
            });
-        if (this.nc && config.connectionListener) {
+        if (this.nc instanceof  Error){
+            return this.nc;
+        }
+        if (config.connectionListener) {
             (async () => {
                 for await (const s of this.nc.status()) {
                     config.connectionListener(s);
@@ -108,8 +111,8 @@ class MessageQueue {
         }
     }
 
-    isActive =  () => {
-       return this.nc ? this.nc.protocol.connected : false;
+    isActive = () => {
+       return this.nc ? this.nc?.protocol?.connected : false;
     }
 }
 

@@ -1,7 +1,7 @@
 <template>
   <el-dialog title="新增连接" width="25%" custom-class="connection-dialog" :close-on-click-modal="false" center
              :visible.sync="isPop">
-    <el-form :model="connection" :rules="rules" label-width="80px" style="height: 300px; text-align: center">
+    <el-form :model="connection" ref="form" :rules="rules" label-width="80px" style="height: 300px; text-align: center">
       <el-form-item label="连接名" required prop="name">
         <el-input clearable
                   size="mini" prefix-icon="el-icon-user" placeholder="请输入连接名"
@@ -40,22 +40,24 @@
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-    <el-button @click="isPop=false" type="danger" size="small" round>取 消</el-button>
-    <el-button type="primary" round @click="isPop=false" size="small">确 定</el-button>
-    <el-button type="success" round size="small" @click="testConnect">测 试 连 接</el-button>
+    <el-button @click="reset" type="danger" size="small" round>重 置</el-button>
+    <el-button @click="submitForm" type="primary" size="small" round>确 定</el-button>
+    <el-button @click="connectTest" type="success" round size="small" :loading="loading">测 试 连 接</el-button>
   </span>
   </el-dialog>
 </template>
 
 <script>
-import {validateIP ,isPort} from "@/utils/Validator";
+import {isPort, validateIP} from "@/utils/Validator";
 import {EventConstant} from "@/busEvent/EventConstant";
+import {nanoid} from "nanoid";
 
 export default {
   name: "ConnectionDialog",
   data() {
     return {
       connection: {
+        id: null,
         name: null,
         host: null,
         port: null,
@@ -64,23 +66,53 @@ export default {
         token: null,
       },
       isPop: false,
+      loading: false,
       rules: {
         name: [
-          {required: true, message: '请输入连接名', trigger: 'blur'},
-          {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur'}
+          {required: true, message: '请输入连接名', trigger: ['blur', 'change']},
+          {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: ['blur', 'change']}
         ],
         host: [
-          {validator:validateIP, trigger: 'blur'},
+          {validator: validateIP, trigger: ['blur', 'change']},
         ],
         port: [
-          {validator:isPort, trigger: 'blur'},
+          {validator: isPort, trigger: ['blur', 'change']},
         ]
       }
     }
   },
-  methods:{
-    testConnect() {
-      this.$bus.$emit(EventConstant.TEST_CONNECTION_CLIENT , this.connection);
+  methods: {
+    connectTest() {
+      this.validateForm(() => {
+        this.loading = true;
+        this.$bus.$emit(EventConstant.TEST_CONNECTION_CLIENT, this.connection, () => this.loading = false);
+      })
+    },
+    submitForm() {
+      this.validateForm(() => {
+        this.connection.id = nanoid();
+        this.$bus.$emit(EventConstant.ADD_CONNECTION_CLIENT, JSON.parse(JSON.stringify(this.connection)));
+        this.isPop = false;
+      })
+    },
+    reset() {
+      this.$refs.form?.resetFields();
+    },
+    validateForm(fn) {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          fn();
+        } else {
+          return false;
+        }
+      });
+    }
+  },
+  watch: {
+    isPop(newValue) {
+      if (newValue) {
+        this.reset();
+      }
     }
   }
 }
