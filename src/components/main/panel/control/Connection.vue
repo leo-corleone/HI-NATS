@@ -44,7 +44,11 @@ export default {
   methods: {
     async connect() {
       if (this.isLoading) {
-        this.$notify.warning('正在重连!!!');
+        if (this.state === 0){
+          this.$notify.warning('正在重连!!!');
+        }else {
+          this.$notify.warning('正在连接!!!');
+        }
         return;
       }
       if (this.isActive()) {
@@ -110,6 +114,15 @@ export default {
              break;
          }
          console.log(status.type)
+      }
+    },
+    state:{
+      handler(s){
+        if (s === 0){
+          this.isLoading = true;
+        }else {
+          this.isLoading = false;
+        }
       }
     }
   }
