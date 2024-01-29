@@ -37,6 +37,7 @@ export default {
       state: false,
       client: new MessageQueue(),
       isLoading: false,
+      status: null,
     }
   },
   methods: {
@@ -44,7 +45,7 @@ export default {
       if (this.isLoading) {
         return;
       }
-      if (this.client.isActive()) {
+      if (this.client?.isActive()) {
         this.$notify.warning('已连接成功!!!');
         return;
       }
@@ -60,8 +61,10 @@ export default {
         connectionListener: this.connectionListener,
       });
       if (nc instanceof Error) {
+        this.state = false;
         this.$notify.error({title: '连接失败', message: nc.message})
       } else {
+        this.state = true;
         this.$notify.success('连接成功')
       }
       this.isLoading = false;
@@ -73,11 +76,14 @@ export default {
       console.log(this);
     },
     connectionListener(status) {
-      console.log(JSON.stringify(status));
+      this.status = status.type;
     },
   },
   beforeDestroy() {
-    this.client.close().then();
+    this.client?.close().then(()=>{
+      console.log('beforeDestroy in' , this.client.isActive())
+    });
+    console.log('beforeDestroy out' , this.client.isActive())
   },
   computed: {
     contentToolTip() {
@@ -85,10 +91,9 @@ export default {
     },
   },
   watch: {
-    client: {
-      deep: true,
-      handler(client) {
-        this.state = client.isActive();
+    status: {
+      handler(status) {
+        console.log(this.status)
       }
     }
   }
