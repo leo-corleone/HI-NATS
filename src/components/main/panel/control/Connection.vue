@@ -1,8 +1,8 @@
 <template>
   <div class="connect-warp">
     <div class="connect-warp-outer">
-      <el-tooltip class="item" effect="dark" :content="state ? '已连接' : '未连接'" placement="left-end">
-        <div class="connect-warp-icon" :style="state ? 'color:green': 'color:red'">
+      <el-tooltip class="item" effect="dark" :content="state === 1 ? '已连接' : '未连接'" placement="left-end">
+        <div class="connect-warp-icon" :style="state === 1 ? 'color:green': 'color:red'">
           <i class="el-icon-cloudy"></i>
         </div>
       </el-tooltip>
@@ -16,7 +16,7 @@
           <div :class="isLoading ? 'el-icon-loading' : 'el-icon-link'" @click="connect"></div>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" content="编辑连接" placement="top-start">
-          <div class="el-icon-setting" @click="setting"></div>
+          <div class="el-icon-setting" @click="editConnection"></div>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" content="点击删除" placement="top-start">
           <div class="el-icon-delete" @click="deleteConnection"></div>
@@ -34,7 +34,8 @@ export default {
   props: ['config'],
   data() {
     return {
-      state: false,
+      // -1: 未连接 , 0:正在重连 , 1:已连接
+      state: -1,
       client: new MessageQueue(),
       isLoading: false,
       status: null,
@@ -43,9 +44,10 @@ export default {
   methods: {
     async connect() {
       if (this.isLoading) {
+        this.$notify.warning('正在重连!!!');
         return;
       }
-      if (this.client?.isActive()) {
+      if (this.isActive()) {
         this.$notify.warning('已连接成功!!!');
         return;
       }
@@ -61,29 +63,29 @@ export default {
         connectionListener: this.connectionListener,
       });
       if (nc instanceof Error) {
-        this.state = false;
+        this.state = -1;
         this.$notify.error({title: '连接失败', message: nc.message})
       } else {
-        this.state = true;
+        this.state = 1;
         this.$notify.success('连接成功')
       }
       this.isLoading = false;
     },
-    setting() {
+    editConnection() {
       console.log(this);
     },
     deleteConnection() {
       console.log(this);
     },
     connectionListener(status) {
-      this.status = status.type;
+      this.status = status;
     },
+    isActive(){
+      return this.client.isActive();
+    }
   },
   beforeDestroy() {
-    this.client?.close().then(()=>{
-      console.log('beforeDestroy in' , this.client.isActive())
-    });
-    console.log('beforeDestroy out' , this.client.isActive())
+    this.client.close().then();
   },
   computed: {
     contentToolTip() {
@@ -93,7 +95,21 @@ export default {
   watch: {
     status: {
       handler(status) {
-        console.log(this.status)
+         switch (status.type){
+           case 'pingTimer':
+             this.state = 1;
+             break;
+           case 'reconnecting' :
+             this.state = 0;
+             break;
+           case 'reconnect':
+             this.state = 0;
+             break;
+           case  'disconnect':
+             this.state = -1;
+             break;
+         }
+         console.log(status.type)
       }
     }
   }

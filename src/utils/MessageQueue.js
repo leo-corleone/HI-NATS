@@ -33,8 +33,10 @@ class MessageQueue {
                    return err;
                }
            });
-        if (this.nc instanceof  Error){
-            return this.nc;
+        if (this.nc instanceof Error){
+            let err = this.nc;
+            this.nc = null
+            return err;
         }
         if (config.connectionListener) {
             (async () => {
@@ -106,7 +108,7 @@ class MessageQueue {
     }
 
     close = async () => {
-        if (this.nc) {
+        if (this.isActive()) {
            return  await this.nc.drain();
         }
     }

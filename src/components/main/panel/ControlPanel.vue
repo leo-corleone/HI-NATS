@@ -56,7 +56,6 @@ export default {
        const mq = new MessageQueue();
        mq.conn(config).then(nc => {
          if (nc instanceof Error){
-           console.log(nc)
            this.$notify.error({title:'连接失败' , message:nc.message})
          }else {
            this.$notify.success('连接成功')
