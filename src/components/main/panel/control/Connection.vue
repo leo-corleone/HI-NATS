@@ -73,7 +73,7 @@ export default {
       console.log(this);
     },
     connectionListener(status) {
-      console.log('xxxxxxxxx' , JSON.stringify(status));
+      console.log(JSON.stringify(status));
     },
   },
   beforeDestroy() {
@@ -87,7 +87,6 @@ export default {
   watch: {
     client: {
       deep: true,
-      immediate: true,
       handler(client) {
         this.state = client.isActive();
       }

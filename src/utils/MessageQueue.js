@@ -112,7 +112,7 @@ class MessageQueue {
     }
 
     isActive = () => {
-       return this.nc ? !this.nc.isDraining() : false;
+       return this.nc ? !this.nc.isClosed() : false;
     }
 }
 
