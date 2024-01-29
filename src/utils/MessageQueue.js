@@ -13,7 +13,7 @@ class MessageQueue {
     conn = async (config) => {
         this.nc = await connect({
             servers: [`nats://${config.host}:${config.port}`],
-            timeout: 3000,
+            timeout: 1000,
             reconnect: true,
             maxReconnectAttempts: -1,
             pingInterval: 3000,
@@ -107,12 +107,12 @@ class MessageQueue {
 
     close = async () => {
         if (this.nc) {
-            await this.nc.close();
+           return  await this.nc.drain();
         }
     }
 
     isActive = () => {
-       return this.nc ? this.nc?.protocol?.connected : false;
+       return this.nc ? !this.nc.isDraining() : false;
     }
 }
 

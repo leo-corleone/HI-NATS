@@ -45,7 +45,7 @@ export default {
         return;
       }
       if (this.client.isActive()) {
-        this.$notify.info('已连接成功!!!');
+        this.$notify.warning('已连接成功!!!');
         return;
       }
       this.isLoading = true;
@@ -75,6 +75,9 @@ export default {
     connectionListener(status) {
       console.log('xxxxxxxxx' , JSON.stringify(status));
     },
+  },
+  beforeDestroy() {
+    this.client.close().then();
   },
   computed: {
     contentToolTip() {
