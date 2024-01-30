@@ -1,5 +1,8 @@
 <template>
   <div class="connect-warp">
+    <div>
+      <EditConnectionDialog :config="config" ref="editConnection"/>
+    </div>
     <div class="connect-warp-outer">
       <el-tooltip class="item" effect="dark" :content="state === 1 ? '已连接' : '未连接'" placement="left-end">
         <div class="connect-warp-icon" :style="state === 1 ? 'color:green': 'color:red'">
@@ -28,10 +31,15 @@
 
 <script>
 import MessageQueue from "@/utils/MessageQueue";
+import EditConnectionDialog from "@/components/dialog/EditConnectionDialog.vue";
+import {EventConstant} from "@/busEvent/EventConstant";
 
 export default {
   name: "Connection",
   props: ['config'],
+  components:{
+    EditConnectionDialog
+  },
   data() {
     return {
       // -1: 未连接 , 0:正在重连 , 1:已连接
@@ -75,21 +83,38 @@ export default {
       }
       this.isLoading = false;
     },
-    editConnection() {
-      console.log(this);
+    async editConnection() {
+      if (this.isActive()){
+        let result = await this.$confirm('此操作将会断开连接, 是否继续?' , '提示',{
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).catch(err => err);
+        if (result === 'confirm'){
+          this.close();
+        }else {
+          return;
+        }
+      }
+      this.$refs.editConnection.isPop = true;
     },
     deleteConnection() {
-      console.log(this);
+      this.$bus.$emit(EventConstant.DELETE_CONNECTION , this.config.id);
     },
     connectionListener(status) {
       this.status = status;
     },
     isActive(){
       return this.client.isActive();
+    },
+    close(){
+      this.client.close().then(()=>{
+        this.state = -1
+      });
     }
   },
   beforeDestroy() {
-    this.client.close().then();
+    this.close();
   },
   computed: {
     contentToolTip() {

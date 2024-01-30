@@ -1,6 +1,6 @@
 <template>
  <div class="ctrl-panel-wrap">
-   <ConnectionDialog ref="connectDialog"></ConnectionDialog>
+   <NewConnectionDialog ref="connectDialog"></NewConnectionDialog>
    <div class="ctrl-panel-left">
      <div class="ctrl-panel-tool">
        <el-input
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import ConnectionDialog from "@/components/dialog/ConnectionDialog.vue";
+import NewConnectionDialog from "@/components/dialog/NewConnectionDialog.vue";
 import {EventConstant} from "@/busEvent/EventConstant";
 import MessageQueue from "@/utils/MessageQueue";
 import Connection from "@/components/main/panel/control/Connection.vue";
@@ -36,7 +36,7 @@ export default {
   name: "ControlPanel",
   components:{
     Connection,
-    ConnectionDialog
+    NewConnectionDialog
   },
   data(){
     return {
@@ -46,25 +46,40 @@ export default {
     }
   },
   methods:{
+    testConnection(config , callback){
+      const mq = new MessageQueue();
+      mq.conn(config).then(nc => {
+        if (nc instanceof Error){
+          this.$notify.error({title:'连接失败' , message:nc.message})
+        }else {
+          this.$notify.success('连接成功')
+          nc.close();
+        }
+        callback();
+      });
+    },
     openConnectionDialog() {
       this.$refs.connectDialog.isPop = true;
     },
-    addConnectionClient(config){
+    addConnection(config){
       this.cacheConnections.push(config);
     },
-    connectionTest(config , callback){
-       const mq = new MessageQueue();
-       mq.conn(config).then(nc => {
-         if (nc instanceof Error){
-           this.$notify.error({title:'连接失败' , message:nc.message})
-         }else {
-           this.$notify.success('连接成功')
-           nc.close();
-         }
-         callback();
-       });
+    editConnection(config) {
+      this.cacheConnections.filter(connection =>{
+        if (connection.id === config.id){
+          connection.name = config.name;
+          connection.host = config.host;
+          connection.port = config.port;
+          connection.username = config.username;
+          connection.password = config.password;
+          connection.token = config.token;
+        }
+      });
     },
-    updateConnectionData(){
+    deleteConnection(uid){
+       this.cacheConnections = this.cacheConnections.filter(con => con.id !== uid);
+    },
+    searchConnection(){
       if (this.searchKey === null || this.searchKey === ''){
         this.connections = this.cacheConnections;
       }else {
@@ -72,14 +87,16 @@ export default {
           return connection.name.indexOf(this.searchKey) !== -1 || connection.host.indexOf(this.searchKey) !== -1
         })
       }
-    },
-    searchConnection(){
-      this.updateConnectionData();
     }
   },
   mounted() {
-    this.$bus.$on(EventConstant.ADD_CONNECTION_CLIENT , this.addConnectionClient)
-    this.$bus.$on(EventConstant.TEST_CONNECTION_CLIENT , this.connectionTest)
+    this.$bus.$on(EventConstant.ADD_CONNECTION , this.addConnection);
+    this.$bus.$on(EventConstant.TEST_CONNECTION , this.testConnection);
+    this.$bus.$on(EventConstant.EDIT_CONNECTION , this.editConnection);
+    this.$bus.$on(EventConstant.DELETE_CONNECTION , this.deleteConnection);
+  },
+  beforeDestroy() {
+    this.$off([EventConstant.EDIT_CONNECTION , EventConstant.TEST_CONNECTION , EventConstant.ADD_CONNECTION , EventConstant.DELETE_CONNECTION]);
   },
   computed: {
     inputDisabled(){
@@ -91,7 +108,7 @@ export default {
       deep:true,
       immediate:true,
       handler(value){
-        this.updateConnectionData();
+        this.searchConnection();
         localStorage.setItem('connections' , JSON.stringify(value));
       }
     }

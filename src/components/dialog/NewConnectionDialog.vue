@@ -1,7 +1,7 @@
 <template>
   <el-dialog title="新增连接" width="25%" custom-class="connection-dialog" :close-on-click-modal="false" center
              :visible.sync="isPop">
-    <el-form :model="connection" ref="form" :rules="rules" label-width="80px" style="height: 300px; text-align: center">
+    <el-form :model="connection" ref="newForm" :rules="rules" label-width="80px" style="height: 300px; text-align: center">
       <el-form-item label="连接名" required prop="name">
         <el-input clearable
                   size="mini" prefix-icon="el-icon-user" placeholder="请输入连接名"
@@ -53,7 +53,7 @@ import {EventConstant} from "@/busEvent/EventConstant";
 import {nanoid} from "nanoid";
 
 export default {
-  name: "ConnectionDialog",
+  name: "NewConnectionDialog",
   data() {
     return {
       connection: {
@@ -85,21 +85,21 @@ export default {
     connectTest() {
       this.validateForm(() => {
         this.loading = true;
-        this.$bus.$emit(EventConstant.TEST_CONNECTION_CLIENT, this.connection, () => this.loading = false);
+        this.$bus.$emit(EventConstant.TEST_CONNECTION, this.connection, () => this.loading = false);
       })
     },
     submitForm() {
       this.validateForm(() => {
         this.connection.id = nanoid();
-        this.$bus.$emit(EventConstant.ADD_CONNECTION_CLIENT, JSON.parse(JSON.stringify(this.connection)));
+        this.$bus.$emit(EventConstant.ADD_CONNECTION, JSON.parse(JSON.stringify(this.connection)));
         this.isPop = false;
       })
     },
     reset() {
-      this.$refs.form?.resetFields();
+      this.$refs.newForm?.resetFields();
     },
     validateForm(fn) {
-      this.$refs.form.validate((valid) => {
+      this.$refs.newForm.validate((valid) => {
         if (valid) {
           fn();
         } else {
