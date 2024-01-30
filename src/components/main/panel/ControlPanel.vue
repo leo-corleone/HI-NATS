@@ -17,11 +17,11 @@
        <el-button @click="openConnectionDialog" size="mini" icon="el-icon-plus" type="primary" round></el-button>
      </div>
      <div class="ctrl-panel-left-bottom">
-       <Connection v-for="connection in connections" :config="connection" :key="connection.id"/>
+       <Connection :ref="connection.id"  v-for="connection in connections" :config="connection" :key="connection.id"/>
      </div>
    </div>
    <div class="ctrl-panel-right">
-     <router-view></router-view>
+    <ControlView v-if="config != null" :config="config" :mq="mq" />
    </div>
  </div>
 </template>
@@ -31,18 +31,22 @@ import NewConnectionDialog from "@/components/dialog/NewConnectionDialog.vue";
 import {EventConstant} from "@/busEvent/EventConstant";
 import MessageQueue from "@/utils/MessageQueue";
 import Connection from "@/components/main/panel/control/Connection.vue";
+import ControlView from "@/components/main/panel/control/ControlView.vue";
 
 export default {
   name: "ControlPanel",
   components:{
+    ControlView,
     Connection,
-    NewConnectionDialog
+    NewConnectionDialog,
   },
   data(){
     return {
       searchKey:'',
       connections:[],
       cacheConnections:JSON.parse(localStorage.getItem('connections')) || [],
+      config: null,
+      mq: null,
     }
   },
   methods:{
@@ -78,6 +82,7 @@ export default {
     },
     deleteConnection(uid){
        this.cacheConnections = this.cacheConnections.filter(con => con.id !== uid);
+       localStorage.removeItem(uid)
     },
     searchConnection(){
       if (this.searchKey === null || this.searchKey === ''){
@@ -87,6 +92,11 @@ export default {
           return connection.name.indexOf(this.searchKey) !== -1 || connection.host.indexOf(this.searchKey) !== -1
         })
       }
+    },
+    gotoControlView(config , mq) {
+       this.config = null;
+       this.config = config;
+       this.mq = mq;
     }
   },
   mounted() {
@@ -94,6 +104,7 @@ export default {
     this.$bus.$on(EventConstant.TEST_CONNECTION , this.testConnection);
     this.$bus.$on(EventConstant.EDIT_CONNECTION , this.editConnection);
     this.$bus.$on(EventConstant.DELETE_CONNECTION , this.deleteConnection);
+    this.$bus.$on(EventConstant.GOTO_CONTROL_VIEW , this.gotoControlView);
   },
   beforeDestroy() {
     this.$off([EventConstant.EDIT_CONNECTION , EventConstant.TEST_CONNECTION , EventConstant.ADD_CONNECTION , EventConstant.DELETE_CONNECTION]);
@@ -154,7 +165,7 @@ export default {
   .ctrl-panel-left-bottom{
     width: 100%;
     height: auto;
-    padding: 5px 0px;
+    padding: 5px 0;
   }
 
   .ctrl-panel-left-bottom > div{

@@ -5,6 +5,7 @@ import ControlPanel from "@/components/main/panel/ControlPanel.vue";
 import MonitorPanel from "@/components/main/panel/MonitorPanel.vue";
 import LogPanel from "@/components/main/panel/LogPanel.vue";
 import Profile from "@/components/main/Profile.vue";
+import ControlView from "@/components/main/panel/control/ControlView.vue";
 
 const push = VueRouter.prototype.push
 const replace = VueRouter.prototype.replace
@@ -31,6 +32,13 @@ const router = new VueRouter({
             name: "controlPanel",
             path: '/controlPanel',
             component: ControlPanel,
+            children:[
+                {
+                    name: 'controlView',
+                    path: 'controlView',
+                    component: ControlView
+                }
+            ]
         },
         {
             name: "monitorPanel",

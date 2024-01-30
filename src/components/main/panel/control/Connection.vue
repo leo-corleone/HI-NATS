@@ -10,19 +10,19 @@
         </div>
       </el-tooltip>
       <el-tooltip class="item" effect="dark" :content="contentToolTip" placement="left-end">
-        <div class="connect-warp-content ellipsis">
+        <div class="connect-warp-content ellipsis" @click="gotoControlView">
           {{ config.name }}@{{ config.host }}:{{ config.port }}
         </div>
       </el-tooltip>
       <div class="connect-warp-ctrl">
         <el-tooltip class="item" effect="dark" content="点击连接" placement="top-start">
-          <div :class="isLoading ? 'el-icon-loading' : 'el-icon-link'" @click="connect"></div>
+          <div :class="isLoading ? 'el-icon-loading' : 'el-icon-link'" @click.stop="connect"></div>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" content="编辑连接" placement="top-start">
-          <div class="el-icon-setting" @click="editConnection"></div>
+          <div class="el-icon-setting" @click.stop="editConnection"></div>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" content="点击删除" placement="top-start">
-          <div class="el-icon-delete" @click="deleteConnection"></div>
+          <div class="el-icon-delete" @click.stop="deleteConnection"></div>
         </el-tooltip>
       </div>
     </div>
@@ -98,8 +98,15 @@ export default {
       }
       this.$refs.editConnection.isPop = true;
     },
-    deleteConnection() {
-      this.$bus.$emit(EventConstant.DELETE_CONNECTION , this.config.id);
+    async deleteConnection() {
+      let result = await this.$confirm(`是否删除:${this.config.name}?` , '删除' ,{
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'error'
+      }).catch(err => err);
+      if (result === 'confirm'){
+        this.$bus.$emit(EventConstant.DELETE_CONNECTION , this.config.id);
+      }
     },
     connectionListener(status) {
       this.status = status;
@@ -111,6 +118,13 @@ export default {
       this.client.close().then(()=>{
         this.state = -1
       });
+    },
+    gotoControlView(){
+      if (!this.isActive()){
+        this.$notify.error('请先连接');
+        return;
+      }
+      this.$bus.$emit(EventConstant.GOTO_CONTROL_VIEW , this.config , this.client);
     }
   },
   beforeDestroy() {
@@ -138,16 +152,11 @@ export default {
              this.state = -1;
              break;
          }
-         console.log(status.type)
       }
     },
     state:{
       handler(s){
-        if (s === 0){
-          this.isLoading = true;
-        }else {
-          this.isLoading = false;
-        }
+        this.isLoading = s === 0;
       }
     }
   }
