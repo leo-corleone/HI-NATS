@@ -15,7 +15,9 @@ export default {
   },
   methods:{
     updateView(){
-         console.log(this.mq.nc.options.servers)
+      this.mq.sub('$report.$data.wjzq.v1.ovgc.app.service.status' , (data)=>{
+        console.log(data)
+      })
     },
   },
   beforeDestroy() {
