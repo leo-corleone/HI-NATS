@@ -21,7 +21,7 @@
      </div>
    </div>
    <div class="ctrl-panel-right">
-    <ControlView v-if="config != null" :config="config" :mq="mq" />
+    <ControlView v-if="config != null" :config="config" :client="client" />
    </div>
  </div>
 </template>
@@ -46,7 +46,7 @@ export default {
       connections:[],
       cacheConnections:JSON.parse(localStorage.getItem('connections')) || [],
       config: null,
-      mq: null,
+      client: null,
     }
   },
   methods:{
@@ -93,10 +93,10 @@ export default {
         })
       }
     },
-    gotoControlView(config , mq) {
+    gotoControlView(config , client) {
        this.config = null;
        this.config = config;
-       this.mq = mq;
+       this.client = client;
     }
   },
   mounted() {
@@ -141,7 +141,7 @@ export default {
   .ctrl-panel-left{
     width: 20%;
     height: 100%;
-    box-shadow: 1px 0 1px #d7d3d3;
+    box-shadow: 1px 0 5px #d7d3d3;
   }
 
   .ctrl-panel-right{

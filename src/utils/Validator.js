@@ -30,3 +30,22 @@ export function isPort(rule, value, callback) {
     }, 100);
 }
 
+
+export function validateTopic(rule, value, callback){
+    if (!value) {
+        return callback(new Error('请输入主题'));
+    }
+    setTimeout(() => {
+        if (value === '' || typeof (value) === undefined) {
+            callback(new Error('请输入主题'));
+        } else {
+            if (value === '>'){
+                callback(new Error("禁止使用单个通配符'>'订阅"));
+            }else {
+                callback();
+            }
+        }
+    }, 50);
+}
+
+

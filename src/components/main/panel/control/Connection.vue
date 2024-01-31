@@ -10,7 +10,7 @@
         </div>
       </el-tooltip>
       <el-tooltip class="item" effect="dark" :content="contentToolTip" placement="left-end">
-        <div class="connect-warp-content ellipsis" @click="gotoControlView">
+        <div class="connect-warp-content ellipsis el-badge" @click="gotoControlView">
           {{ config.name }}@{{ config.host }}:{{ config.port }}
         </div>
       </el-tooltip>
@@ -125,7 +125,16 @@ export default {
         return;
       }
       this.$bus.$emit(EventConstant.GOTO_CONTROL_VIEW , this.config , this.client);
+    },
+    unsubscribe(uid , topics) {
+      this.cacheSubscription = topics ? topics : JSON.parse(localStorage.getItem(uid)) || [] ;
+      this.cacheSubscription.forEach(topic => {
+        this.client.unsub(topic);
+      })
     }
+  },
+  mounted() {
+    this.$bus.$emit(EventConstant.UNSUBSCRIBE + "_" + this.config.id , this.unsubscribe);
   },
   beforeDestroy() {
     this.close();
