@@ -17,11 +17,11 @@
        <el-button @click="openConnectionDialog" size="mini" icon="el-icon-plus" type="primary" round></el-button>
      </div>
      <div class="ctrl-panel-left-bottom">
-       <Connection :ref="connection.id"  v-for="connection in connections" :config="connection" :key="connection.id"/>
+       <Connection :ref="conn.id"  v-for="conn in connections" :disconnection="disconnection" :switchControlDashboard="switchControlDashboard" :connection="conn" :key="conn.id"/>
      </div>
    </div>
-   <div class="ctrl-panel-right">
-    <ControlView v-if="config != null" :config="config" :client="client" />
+   <div  class="ctrl-panel-right">
+    <ControlDashboard v-if="connection != null" ref="ctrlDashboard" :connection="connection" :client="client" />
    </div>
  </div>
 </template>
@@ -31,21 +31,20 @@ import NewConnectionDialog from "@/components/dialog/NewConnectionDialog.vue";
 import {EventConstant} from "@/busEvent/EventConstant";
 import MessageQueue from "@/utils/MessageQueue";
 import Connection from "@/components/main/panel/control/Connection.vue";
-import ControlView from "@/components/main/panel/control/ControlView.vue";
-
+import ControlDashboard from "@/components/main/panel/control/ControlDashboard.vue";
 export default {
   name: "ControlPanel",
   components:{
-    ControlView,
     Connection,
     NewConnectionDialog,
+    ControlDashboard
   },
   data(){
     return {
       searchKey:'',
       connections:[],
       cacheConnections:JSON.parse(localStorage.getItem('connections')) || [],
-      config: null,
+      connection: null,
       client: null,
     }
   },
@@ -93,10 +92,24 @@ export default {
         })
       }
     },
-    gotoControlView(config , client) {
-       this.config = null;
-       this.config = config;
-       this.client = client;
+    switchControlDashboard(connection , client){
+      if (this.connection && this.connection === connection){
+        return;
+      }
+      let connectionId = this.connection?.id;
+      this.connection = connection;
+      this.client = client;
+      this.$nextTick(()=>{
+        if (connectionId){
+          this.$refs.ctrlDashboard.unSubscribeAllTopic(connectionId);
+        }
+        this.$refs.ctrlDashboard.subscribeAllTopic(this.connection.id);
+      })
+    },
+    disconnection(uid){
+      if (this.connection && this.connection.id === uid){
+        this.connection = null;
+      }
     }
   },
   mounted() {
@@ -104,7 +117,6 @@ export default {
     this.$bus.$on(EventConstant.TEST_CONNECTION , this.testConnection);
     this.$bus.$on(EventConstant.EDIT_CONNECTION , this.editConnection);
     this.$bus.$on(EventConstant.DELETE_CONNECTION , this.deleteConnection);
-    this.$bus.$on(EventConstant.GOTO_CONTROL_VIEW , this.gotoControlView);
   },
   beforeDestroy() {
     this.$off([EventConstant.EDIT_CONNECTION , EventConstant.TEST_CONNECTION , EventConstant.ADD_CONNECTION , EventConstant.DELETE_CONNECTION]);

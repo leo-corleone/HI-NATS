@@ -1,7 +1,7 @@
 <template>
   <div class="connect-warp">
     <div>
-      <EditConnectionDialog :config="config" ref="editConnection"/>
+      <EditConnectionDialog :config="connection" ref="editConnection"/>
     </div>
     <div class="connect-warp-outer">
       <el-tooltip class="item" effect="dark" :content="state === 1 ? '已连接' : '未连接'" placement="left-end">
@@ -10,13 +10,13 @@
         </div>
       </el-tooltip>
       <el-tooltip class="item" effect="dark" :content="contentToolTip" placement="left-end">
-        <div class="connect-warp-content ellipsis el-badge" @click="gotoControlView">
-          {{ config.name }}@{{ config.host }}:{{ config.port }}
+        <div class="connect-warp-content ellipsis el-badge" @click="toControlDashboard">
+          {{ connection.name }}@{{ connection.host }}:{{ connection.port }}
         </div>
       </el-tooltip>
       <div class="connect-warp-ctrl">
-        <el-tooltip class="item" effect="dark" content="点击连接" placement="top-start">
-          <div :class="isLoading ? 'el-icon-loading' : 'el-icon-link'" @click.stop="connect"></div>
+        <el-tooltip class="item" effect="dark" :content="state === 1 ? '点击断开' : '点击连接'" placement="top-start">
+          <div :style="state === 1 ? 'color:red':'color:green'" :class="isLoading ? 'el-icon-loading' : 'el-icon-switch-button'" @click.stop="connect"></div>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" content="编辑连接" placement="top-start">
           <div class="el-icon-setting" @click.stop="editConnection"></div>
@@ -36,7 +36,7 @@ import {EventConstant} from "@/busEvent/EventConstant";
 
 export default {
   name: "Connection",
-  props: ['config'],
+  props: ['connection','switchControlDashboard' ,'disconnection'],
   components:{
     EditConnectionDialog
   },
@@ -47,6 +47,12 @@ export default {
       client: new MessageQueue(),
       isLoading: false,
       status: null,
+      cacheSubscription:JSON.parse(localStorage.getItem(this.connection.id)) || [],
+      subscription:{
+        id:null,
+        color: null,
+        topic:null
+      }
     }
   },
   methods: {
@@ -60,17 +66,18 @@ export default {
         return;
       }
       if (this.isActive()) {
-        this.$notify.warning('已连接成功!!!');
+        this.disconnection(this.connection.id);
+        this.close();
         return;
       }
       this.isLoading = true;
       const nc = await this.client.conn({
-        name: this.config.name,
-        token: this.config.token,
-        user: this.config.username,
-        pass: this.config.password,
-        host: this.config.host,
-        port: this.config.port,
+        name: this.connection.name,
+        token: this.connection.token,
+        user: this.connection.username,
+        pass: this.connection.password,
+        host: this.connection.host,
+        port: this.connection.port,
         noEcho: false,
         connectionListener: this.connectionListener,
       });
@@ -99,13 +106,13 @@ export default {
       this.$refs.editConnection.isPop = true;
     },
     async deleteConnection() {
-      let result = await this.$confirm(`是否删除:${this.config.name}?` , '删除' ,{
+      let result = await this.$confirm(`是否删除:${this.connection.name}?` , '删除' ,{
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'error'
       }).catch(err => err);
       if (result === 'confirm'){
-        this.$bus.$emit(EventConstant.DELETE_CONNECTION , this.config.id);
+        this.$bus.$emit(EventConstant.DELETE_CONNECTION , this.connection.id);
       }
     },
     connectionListener(status) {
@@ -119,29 +126,81 @@ export default {
         this.state = -1
       });
     },
-    gotoControlView(){
+    toControlDashboard(){
       if (!this.isActive()){
         this.$notify.error('请先连接');
         return;
       }
-      this.$bus.$emit(EventConstant.GOTO_CONTROL_VIEW , this.config , this.client);
+      this.switchControlDashboard(this.connection , this.client);
     },
-    unsubscribe(uid , topics) {
-      this.cacheSubscription = topics ? topics : JSON.parse(localStorage.getItem(uid)) || [] ;
-      this.cacheSubscription.forEach(topic => {
-        this.client.unsub(topic);
+    unsubscribeAllTopic() {
+      if (!this.client.isActive()){
+        return;
+      }
+      this.cacheSubscription = JSON.parse(localStorage.getItem(this.connection.id)) || [];
+      this.cacheSubscription.forEach(subscription => {
+        this.client.unsub(subscription.topic);
+      });
+    },
+    subscribeAllTopic(fn){
+      if (!this.client.isActive()){
+        return;
+      }
+      this.cacheSubscription = JSON.parse(localStorage.getItem(this.connection.id)) || [];
+      this.cacheSubscription.forEach(subscription => {
+        this.client.sub(subscription.topic , (data)=>{
+           fn(subscription , data);
+        });
       })
+    },
+    subscribe(subscription ,fn){
+      if (!this.isActive()){
+        this.$notify.error("未连接,无法订阅");
+        return;
+      }
+      this.client.sub(subscription.topic , (data)=>{
+        fn(subscription , data);
+      });
+    },
+    unSubscribe(subscription){
+      this.client.unsub(subscription.topic);
+    },
+    publish(publication , cb){
+      if (!this.isActive()){
+        this.$notify.error('服务未连接');
+        return
+      }
+      this.client.pub(publication.topic , publication.data)
+      cb && cb();
+    },
+    request(request , cb){
+      if (!this.isActive()){
+        this.$notify.error('服务未连接');
+        return
+      }
+      let re = this.client.req(request.topic , request.data)
+      cb && cb();
+      if (re instanceof Error){
+        this.$notify.error(re.message);
+        return null;
+      }
+      return re;
     }
   },
   mounted() {
-    this.$bus.$emit(EventConstant.UNSUBSCRIBE + "_" + this.config.id , this.unsubscribe);
+    this.$bus.$on(EventConstant.UNSUBSCRIBE_ALL  + this.connection.id , this.unsubscribeAllTopic);
+    this.$bus.$on(EventConstant.UNSUBSCRIBE  + this.connection.id , this.unSubscribe);
+    this.$bus.$on(EventConstant.SUBSCRIBE_ALL  + this.connection.id , this.subscribeAllTopic);
+    this.$bus.$on(EventConstant.SUBSCRIBE  + this.connection.id , this.subscribe);
+    this.$bus.$on(EventConstant.REQUEST + this.connection.id , this.request);
+    this.$bus.$on(EventConstant.PUBLICATION + this.connection.id , this.publish);
   },
   beforeDestroy() {
     this.close();
   },
   computed: {
     contentToolTip() {
-      return this.config.name + "@" + this.config.host + ":" + this.config.port;
+      return this.connection.name + "@" + this.connection.host + ":" + this.connection.port;
     },
   },
   watch: {

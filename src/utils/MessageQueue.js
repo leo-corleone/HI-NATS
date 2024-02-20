@@ -66,7 +66,7 @@ class MessageQueue {
     };
 
     unsub = (topic) => {
-        if (this.subCache.has(topic) && this.subscriptions.has(topic) && this.nc) {
+        if (this.subCache.has(topic) && this.subscriptions.has(topic)) {
             this.subscriptions.get(topic)
                 .drain()
                 .then(() => {
@@ -109,7 +109,9 @@ class MessageQueue {
 
     close = async () => {
         if (this.isActive()) {
-           return  await this.nc.drain();
+           this.subCache.clear();
+           this.subscriptions.clear();
+           return await this.nc.drain();
         }
     }
 

@@ -23,7 +23,7 @@ export default {
   }
 
   .dashboard-wrap-inner{
-    width: 80%;
+    width: 90%;
     height: 100%;
     margin: 0 auto;
   }

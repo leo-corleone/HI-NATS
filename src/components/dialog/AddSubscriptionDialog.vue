@@ -1,8 +1,9 @@
 <template>
   <div>
-    <el-dialog title="新增订阅" width="25%"  :close-on-click-modal="false" center
+    <el-dialog title="新增订阅" width="25%" :close-on-click-modal="false" center
                :visible.sync="isPop">
-      <el-form :model="subscription" :rules="rules"  ref="editSubForm" label-width="80px" style="height: 150px; text-align: center">
+      <el-form :model="subscription" :rules="rules" ref="editSubForm" label-width="80px"
+               style="height: 150px; text-align: center">
         <el-form-item label="主题" required prop="topic">
           <el-input clearable
                     size="mini" prefix-icon="el-icon-star-off" placeholder="请输入主题"
@@ -24,8 +25,8 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-    <el-button  type="danger" size="small" @click="isPop = false" round>取 消</el-button>
-    <el-button  type="primary" size="small" @click="submitSubscribe" :loading="loading" round>确 定</el-button>
+    <el-button type="danger" size="small" @click="isPop = false" round>取 消</el-button>
+    <el-button type="primary" size="small" @click="submitSubscribe" :loading="loading" round>确 定</el-button>
   </span>
     </el-dialog>
   </div>
@@ -33,22 +34,21 @@
 
 <script>
 import {validateTopic} from "@/utils/Validator";
-import {EventConstant} from "@/busEvent/EventConstant";
 
 export default {
   name: "AddSubscriptionDialog",
-  props:['connectionId'],
-  data(){
+  props: ['connectionId' ,'subscribe'],
+  data() {
     return {
       isPop: false,
       loading: false,
-      subscription:{
+      subscription: {
         id: '',
         color: '#409EFF',
         topic: '',
       },
-      rules:{
-        topic:[
+      rules: {
+        topic: [
           {required: true, message: '请输入主题', trigger: ['blur', 'change']},
           {validator: validateTopic, trigger: ['blur', 'change']},
         ],
@@ -58,29 +58,25 @@ export default {
       }
     }
   },
-  methods:{
+  methods: {
     changeLoadingState(bool = true) {
       this.loading = bool
     },
-    submitSubscribe(){
-       let subscriptions = JSON.parse(localStorage.getItem(this.connectionId))
-       console.log(subscriptions);
-       let isExist = subscriptions.filter(subscription => subscription.topic === this.subscription.topic)
-       if (isExist.length === 0){
-         this.validateForm(()=>{
-           this.$bus.$emit(EventConstant.SUBSCRIBE + "_" + this.connectionId , this.subscription);
-           this.changeLoadingState(false);
-         } , ()=>{
-           this.changeLoadingState(false);
-         })
-       }
+    submitSubscribe() {
+      this.validateForm(() => {
+        this.changeLoadingState()
+        let re = this.subscribe(JSON.parse(JSON.stringify(this.subscription)));
+        if (re){
+          this.isPop = false;
+        }
+        this.changeLoadingState(false);
+      });
     },
-    validateForm(fn, fail) {
+    validateForm(fn) {
       this.$refs.editSubForm.validate((valid) => {
         if (valid) {
           fn();
         } else {
-          fail && fail()
           return false;
         }
       });
