@@ -66,9 +66,9 @@ export default {
     padding: 5px;
   }
 
-  .el-icon-collection-tag{
-    width: 70%;
-  }
+  /*.el-icon-collection-tag{*/
+  /*  width: 70%;*/
+  /*}*/
 
   .ctrl-subscription-topic{
     font-size: 15px;

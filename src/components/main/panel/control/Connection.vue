@@ -168,6 +168,7 @@ export default {
     publish(publication , cb){
       if (!this.isActive()){
         this.$notify.error('服务未连接');
+        cb && cb();
         return
       }
       this.client.pub(publication.topic , publication.data)

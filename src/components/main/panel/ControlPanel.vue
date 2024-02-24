@@ -105,6 +105,9 @@ export default {
         }
         this.$refs.ctrlDashboard.subscribeAllTopic(this.connection.id);
       })
+      if (this.$refs.ctrlDashboard){
+        this.$refs.ctrlDashboard.chatRecords = [];
+      }
     },
     disconnection(uid){
       if (this.connection && this.connection.id === uid){

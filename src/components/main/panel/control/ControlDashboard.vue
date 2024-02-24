@@ -63,7 +63,7 @@ export default {
   },
   methods: {
     down(data){
-      console.log(data)
+
     },
     publishData(publication,cb){
       this.$bus.$emit(EventConstant.PUBLICATION + this.connection.id , publication , ()=>{
@@ -100,7 +100,6 @@ export default {
       this.refreshScrollView();
     },
     pushRecord(record){
-      console.log(record);
       this.chatRecords.push(record);
     },
     refreshScrollView(){
@@ -128,11 +127,11 @@ export default {
         return false;
       }
       if (!this.client?.isActive()) {
-        this.$notify.error("未连接,无法取消订阅!!!");
+        this.$notify.error("未连接,无法订阅!!!");
         return false;
       }
       subscription.id = nanoid();
-      this.$bus.$emit(EventConstant.SUBSCRIBE + this.connection.id, subscription, this.renderView);
+      this.$bus.$emit(EventConstant.SUBSCRIBE + this.connection.id, subscription, this.renderSubscription);
       this.cacheSubscription.push(subscription);
       return true;
     },
