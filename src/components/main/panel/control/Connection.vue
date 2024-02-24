@@ -149,7 +149,7 @@ export default {
       this.cacheSubscription = JSON.parse(localStorage.getItem(this.connection.id)) || [];
       this.cacheSubscription.forEach(subscription => {
         this.client.sub(subscription.topic , (data)=>{
-           fn(subscription , data);
+           fn(subscription.topic ,'sub', data);
         });
       })
     },
@@ -159,7 +159,7 @@ export default {
         return;
       }
       this.client.sub(subscription.topic , (data)=>{
-        fn(subscription , data);
+        fn(subscription.topic ,'sub' , data);
       });
     },
     unSubscribe(subscription){
@@ -174,18 +174,14 @@ export default {
       this.client.pub(publication.topic , publication.data)
       cb && cb();
     },
-    request(request , cb){
+    async request(request , cb){
       if (!this.isActive()){
         this.$notify.error('服务未连接');
+        cb && cb(null);
         return
       }
-      let re = this.client.req(request.topic , request.data)
-      cb && cb();
-      if (re instanceof Error){
-        this.$notify.error(re.message);
-        return null;
-      }
-      return re;
+      let re = await this.client.req(request.topic , request.data)
+      cb && cb(re);
     }
   },
   mounted() {

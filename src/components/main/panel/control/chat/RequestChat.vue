@@ -1,20 +1,20 @@
 <template>
-  <div class="ctrl-publish-record-warp">
-    <span class="ctrl-publish-record-content">
-     <div class="ctrl-publish-content-outer">
+  <div class="ctrl-request-record-warp">
+    <span class="ctrl-request-record-content">
+     <div class="ctrl-request-content-outer">
        <span style="max-width: 70%">
-         <div class="ctrl-publish-content-topic">
-           <div class="el-icon-position">
-             <span class="ctrl-publish-record-topic">{{record.topic}}</span>
+         <div class="ctrl-request-content-topic">
+           <div class="el-icon-s-promotion">
+             <span class="ctrl-request-record-topic">{{record.topic}}</span>
            </div>
-           <div class="ctrl-publish-content-main">
+           <div class="ctrl-request-content-main">
              {{record.data}}
            </div>
          </div>
          <el-divider></el-divider>
-         <div class="ctrl-publish-record-bottom">
-          <div class="ctrl-publish-bottom-time">{{record.time}}</div>
-          <div @click="copy" class="ctrl-publish-bottom-copy el-icon-copy-document"></div>
+         <div class="ctrl-request-record-bottom">
+          <div class="ctrl-request-bottom-time">{{record.time}}</div>
+          <div @click="copy" class="ctrl-request-bottom-copy el-icon-copy-document"></div>
         </div>
        </span>
      </div>
@@ -24,7 +24,7 @@
 
 <script>
 export default {
-  name: "PublishChat",
+  name: "requestChat",
   props: ['record'],
   methods:{
     copy(){
@@ -47,36 +47,36 @@ export default {
 </script>
 
 <style scoped>
-.ctrl-publish-record-warp {
+.ctrl-request-record-warp {
   width: 100%;
   height: auto;
 }
 
-.ctrl-publish-record-warp::after{
+.ctrl-request-record-warp::after{
   /*border: 1px solid ;*/
   content: "";
   display: block;
   clear: both;
 }
 
-.ctrl-publish-record-content {
+.ctrl-request-record-content {
   color: #1f1f1f;
 }
 
-.ctrl-publish-content-outer{
+.ctrl-request-content-outer{
   height: border-box;
 }
 
-.ctrl-publish-content-outer > span{
+.ctrl-request-content-outer > span{
   display: block;
   float: right;
-  background-color: #a8e979;
+  background-color: #80e979;
   border-radius: 5px 0 5px 5px;
   padding: 5px;
   margin: 4px 0;
 }
 
-.ctrl-publish-content-main{
+.ctrl-request-content-main{
   padding: 5px;
   height: 100%;
   font-size: 15px;
@@ -87,19 +87,19 @@ export default {
   margin: 2px 0;
 }
 
-.ctrl-publish-record-topic{
+.ctrl-request-record-topic{
   font-size: 12px;
 }
 
-.ctrl-publish-record-bottom div{
+.ctrl-request-record-bottom div{
   float: left;
 }
 
-.ctrl-publish-bottom-time{
+.ctrl-request-bottom-time{
   font-size: 12px;
 }
 
-.ctrl-publish-bottom-copy{
+.ctrl-request-bottom-copy{
   color: green;
   padding: 2px;
   font-size: 12px;

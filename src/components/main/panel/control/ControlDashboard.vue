@@ -3,9 +3,7 @@
     <AddSubscriptionDialog ref="addSub" :subscribe="subscribe" :connectionId="connection.id"/>
     <div class="ctrl-view-left">
       <div class="ctrl-view-left-title">
-        <span class="el-icon-user-solid ellipsis ctrl-view-left-title-info">{{ connection.name }}@{{
-            connection.host
-          }}:{{ connection.port }}</span>
+        <span class="el-icon-user-solid ellipsis ctrl-view-left-title-info">{{ connection.name }}@{{connection.host }}:{{ connection.port }}</span>
         <span class="ctrl-view-left-title-btn">
          <el-tooltip class="item" effect="light" content="点击订阅" placement="top-start">
            <el-button class="el-icon-collection-tag" @click="openSubscriptionDialog" type="success" size="mini"
@@ -23,9 +21,10 @@
           <template v-for="record in chatRecords">
             <SubscriptionChat :key="record.id" :record="record" v-if="record.type === 'sub'"/>
             <PublishChat :key="record.id" :record="record" v-if="record.type === 'pub'"/>
+            <RequestChat :key="record.id" :record="record" v-if="record.type === 'req' "/>
           </template>
         </div>
-        <el-divider @mousedown="down" class="ctrl-view-right-drag-bar"/>
+        <el-divider class="ctrl-view-right-drag-bar"/>
         <div class="ctrl-view-right-wrap-input">
          <TextInputChat :publish-data="publishData" :request-data="requestData"/>
         </div>
@@ -43,7 +42,7 @@ import PublishChat from "@/components/main/panel/control/chat/PublishChat.vue";
 import SubscriptionChat from "@/components/main/panel/control/chat/SubscriptionChat.vue";
 import moment from "moment";
 import TextInputChat from "@/components/main/panel/control/chat/TextInputChat.vue";
-
+import RequestChat from "@/components/main/panel/control/chat/RequestChat.vue";
 
 export default {
   name: "ControlDashboard",
@@ -54,6 +53,7 @@ export default {
     PublishChat,
     SubscriptionChat,
     TextInputChat,
+    RequestChat
   },
   data() {
     return {
@@ -62,41 +62,32 @@ export default {
     }
   },
   methods: {
-    down(data){
-
-    },
     publishData(publication,cb){
       this.$bus.$emit(EventConstant.PUBLICATION + this.connection.id , publication , ()=>{
          cb && cb();
-         this.renderPublication(publication);
+         this.renderChatWindow(publication.topic , publication.type, publication.data);
       })
     },
     requestData(request ,cb) {
       this.$bus.$emit(EventConstant.REQUEST + this.connection.id , request , (data)=>{
         cb && cb();
-        this.renderPublication(request);
+        if (data instanceof Error){
+          this.$notify.error(data.message);
+          return null;
+        }
+        this.renderChatWindow(request.topic ,request.type , data);
       })
     },
-    renderPublication(publication){
-      let chatRecord = {
-        id: nanoid(),
-        data : publication.data,
-        type: 'pub',
-        topic: publication.topic,
-        time: this.getCurrentTime(),
-      }
-      this.pushRecord(chatRecord);
-      this.refreshScrollView();
-    },
-    renderSubscription(subscription ,data) {
+    renderChatWindow(topic ,type ,data) {
       let chatRecord = {
         id: nanoid(),
         data: data,
-        type: 'sub',
-        topic: subscription.topic,
+        type: type,
+        topic: topic,
         time: this.getCurrentTime(),
       }
       this.pushRecord(chatRecord);
+      console.log('chatRecord' ,chatRecord);
       this.refreshScrollView();
     },
     pushRecord(record){
@@ -117,7 +108,7 @@ export default {
       this.$bus.$emit(EventConstant.UNSUBSCRIBE_ALL + uid);
     },
     subscribeAllTopic(uid) {
-      this.$bus.$emit(EventConstant.SUBSCRIBE_ALL + uid, this.renderSubscription);
+      this.$bus.$emit(EventConstant.SUBSCRIBE_ALL + uid, this.renderChatWindow);
     },
     subscribe(subscription) {
       this.refreshCurrentSubscription();
@@ -131,7 +122,7 @@ export default {
         return false;
       }
       subscription.id = nanoid();
-      this.$bus.$emit(EventConstant.SUBSCRIBE + this.connection.id, subscription, this.renderSubscription);
+      this.$bus.$emit(EventConstant.SUBSCRIBE + this.connection.id, subscription, this.renderChatWindow);
       this.cacheSubscription.push(subscription);
       return true;
     },
