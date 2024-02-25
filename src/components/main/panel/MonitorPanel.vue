@@ -1,6 +1,6 @@
 <template>
  <div class="monitor-panel-wrap">
-   MonitorPanel
+   <el-empty description="敬请期待"></el-empty>
  </div>
 </template>
 

@@ -5,8 +5,6 @@ import ControlPanel from "@/components/main/panel/ControlPanel.vue";
 import MonitorPanel from "@/components/main/panel/MonitorPanel.vue";
 import LogPanel from "@/components/main/panel/LogPanel.vue";
 import Profile from "@/components/main/Profile.vue";
-import ControlView from "@/components/main/panel/control/ControlDashboard.vue";
-import ControlDashboard from "@/components/main/panel/control/ControlDashboard.vue";
 
 const push = VueRouter.prototype.push
 const replace = VueRouter.prototype.replace
@@ -51,19 +49,4 @@ const router = new VueRouter({
         }
     ]
 });
-
-// 前置路由
-// router.beforeEach((to, from, next) => {
-//     console.log('to' , to);
-//     console.log('from' , from);
-//     next()
-// })
-//
-// // 后置路由
-// router.afterEach((to ,from) => {
-//     console.log('to' , to);
-//     console.log('from' , from);
-// })
-
-
 export default router

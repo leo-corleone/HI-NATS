@@ -1,6 +1,6 @@
 <template>
  <div class="log-panel-wrap">
-   LogPanel
+   <el-empty description="敬请期待"></el-empty>
  </div>
 </template>
 
