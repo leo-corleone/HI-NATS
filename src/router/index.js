@@ -1,10 +1,8 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Client from "@/components/main/Client.vue";
 import ControlPanel from "@/components/main/panel/ControlPanel.vue";
 import MonitorPanel from "@/components/main/panel/MonitorPanel.vue";
 import LogPanel from "@/components/main/panel/LogPanel.vue";
-import Profile from "@/components/main/Profile.vue";
 
 const push = VueRouter.prototype.push
 const replace = VueRouter.prototype.replace
@@ -23,11 +21,6 @@ const router = new VueRouter({
     mode: 'hash',
     routes: [
         {
-            name: 'client',
-            path: '/client',
-            component: Client,
-        },
-        {
             name: "controlPanel",
             path: '/controlPanel',
             component: ControlPanel,
@@ -41,11 +34,6 @@ const router = new VueRouter({
             name: "logPanel",
             path: '/logPanel',
             component: LogPanel,
-        },
-        {
-            name: "profile",
-            path: "/profile",
-            component: Profile
         }
     ]
 });
