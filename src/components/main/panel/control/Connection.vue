@@ -10,7 +10,7 @@
         </div>
       </el-tooltip>
       <el-tooltip class="item" effect="dark" :content="contentToolTip" placement="left-end">
-        <div class="connect-warp-content ellipsis el-badge" @click="toControlDashboard">
+        <div class="connect-warp-content ellipsis el-badge">
           {{ connection.name }}@{{ connection.host }}:{{ connection.port }}
         </div>
       </el-tooltip>
@@ -36,7 +36,7 @@ import {EventConstant} from "@/busEvent/EventConstant";
 
 export default {
   name: "Connection",
-  props: ['connection','switchControlDashboard' ,'disconnection'],
+  props: ['connection','returnToTab' ,'disconnection'],
   components:{
     EditConnectionDialog
   },
@@ -86,7 +86,7 @@ export default {
         this.$notify.error({title: '连接失败', message: nc.message})
       } else {
         this.state = 1;
-        this.$notify.success('连接成功')
+        this.returnToTab(this.connection);
       }
       this.isLoading = false;
     },
@@ -125,13 +125,6 @@ export default {
       this.client.close().then(()=>{
         this.state = -1
       });
-    },
-    toControlDashboard(){
-      if (!this.isActive()){
-        this.$notify.error('请先连接');
-        return;
-      }
-      this.switchControlDashboard(this.connection , this.client);
     },
     unsubscribeAllTopic() {
       if (!this.client.isActive()){

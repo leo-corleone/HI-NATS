@@ -17,11 +17,15 @@
        <el-button @click="openConnectionDialog" size="mini" icon="el-icon-plus" type="primary" round></el-button>
      </div>
      <div class="ctrl-panel-left-bottom">
-       <Connection :ref="conn.id"  v-for="conn in connections" :disconnection="disconnection" :switchControlDashboard="switchControlDashboard" :connection="conn" :key="conn.id"/>
+       <Connection :ref="conn.id"  v-for="conn in connections" :disconnection="disconnection" :returnToTab="returnToTab" :connection="conn" :key="conn.id"/>
      </div>
    </div>
-   <div  class="ctrl-panel-right">
-    <ControlDashboard v-if="connection != null" ref="ctrlDashboard" :connection="connection" :client="client" />
+   <div class="ctrl-panel-right">
+     <el-tabs  v-model="tabName" type="card" closable @edit="handleTabsEdit" style="width:100%;height: 100%">
+       <el-tab-pane :key="item.name" v-for="item in connectionTabs" :label="item.title" :name="item.name" style="width: 100%;height: 100%">
+         <ControlDashboard :connection="item.connection"/>
+       </el-tab-pane>
+     </el-tabs>
    </div>
  </div>
 </template>
@@ -32,6 +36,7 @@ import {EventConstant} from "@/busEvent/EventConstant";
 import MessageQueue from "@/utils/MessageQueue";
 import Connection from "@/components/main/panel/control/Connection.vue";
 import ControlDashboard from "@/components/main/panel/control/ControlDashboard.vue";
+
 export default {
   name: "ControlPanel",
   components:{
@@ -46,6 +51,9 @@ export default {
       cacheConnections:JSON.parse(localStorage.getItem('connections')) || [],
       connection: null,
       client: null,
+      tabName:"",
+      connectionTabs:[],
+      tabIndex: 0,
     }
   },
   methods:{
@@ -92,27 +100,21 @@ export default {
         })
       }
     },
-    switchControlDashboard(connection , client){
-      if (this.connection && this.connection === connection){
-        return;
-      }
-      let connectionId = this.connection?.id;
-      this.connection = connection;
-      this.client = client;
-      this.$nextTick(()=>{
-        if (connectionId){
-          this.$refs.ctrlDashboard.unSubscribeAllTopic(connectionId);
-        }
-        this.$refs.ctrlDashboard.subscribeAllTopic(this.connection.id);
-      })
-      if (this.$refs.ctrlDashboard){
-        this.$refs.ctrlDashboard.chatRecords = [];
-      }
+    returnToTab(connection){
+        this.connectionTabs.push({
+          title: connection.name,
+          name: connection.id,
+          connection,
+        });
+        this.tabName = connection.id;
     },
     disconnection(uid){
       if (this.connection && this.connection.id === uid){
         this.connection = null;
       }
+    },
+    handleTabsEdit(target , action){
+      console.log(target , action)
     }
   },
   mounted() {
@@ -185,5 +187,14 @@ export default {
 
   .ctrl-panel-left-bottom > div{
     margin-bottom: 1px;
+  }
+
+  /deep/ .el-tabs__content {
+    height: calc(100% - 41px);
+    width: 100%;
+  }
+
+  /deep/ .el-tabs__header {
+    margin: 0;
   }
 </style>

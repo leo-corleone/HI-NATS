@@ -87,7 +87,6 @@ export default {
         time: this.getCurrentTime(),
       }
       this.pushRecord(chatRecord);
-      console.log('chatRecord' ,chatRecord);
       this.refreshScrollView();
     },
     pushRecord(record){
@@ -166,7 +165,7 @@ export default {
   height: 100%;
 }
 
-.ctrl-view-wrap .ctrl-view-right, .ctrl-view-wrap .ctrl-view-left {
+.ctrl-view-wrap > .ctrl-view-right, .ctrl-view-wrap > .ctrl-view-left {
   float: left;
 }
 
