@@ -3,7 +3,6 @@
     <AddSubscriptionDialog ref="addSub" :subscribe="subscribe" :connectionId="connection.id"/>
     <div class="ctrl-view-left">
       <div class="ctrl-view-left-title">
-        <span class="el-icon-user-solid ellipsis ctrl-view-left-title-info">{{ connection.name }}</span>
         <span class="ctrl-view-left-title-btn">
          <el-tooltip class="item" effect="light" content="点击订阅" placement="top-start">
            <el-button class="el-icon-collection-tag" @click="openSubscriptionDialog" type="success" size="mini"
