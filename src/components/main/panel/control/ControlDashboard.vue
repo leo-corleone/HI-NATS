@@ -1,23 +1,26 @@
 <template>
   <div class="ctrl-view-wrap">
-    <AddSubscriptionDialog ref="addSub" :subscribe="subscribe" :connectionId="connection.id"/>
+    <AddSubscriptionDialog ref="addSub" :addSubscribe="addSubscribe" :connectionId="connection.id"/>
     <div class="ctrl-view-left">
       <div class="ctrl-view-left-title">
         <div class="ctrl-view-left-title-btn">
-          <el-button class="el-icon-collection-tag" @click="openSubscriptionDialog" type="warning" size="mini"
+          <el-button class="el-icon-collection-tag"
+                     @click="openSubscriptionDialog"
+                     type="warning" size="mini"
+                     :disabled="!isActive"
                      plain> 订阅
           </el-button>
           <el-button class="el-icon-switch-button"
                      :loading="loading"
                      @click="switchConnect"
-                     type="success"
+                     :type="isActive ? 'danger' : 'success'"
                      size="mini"
-                     plain> 连接
+                     plain> {{isActive ? '取消连接' : '连接'}}
           </el-button>
         </div>
       </div>
       <div class="ctrl-view-left-subs infinite-list" style="overflow-y:auto">
-        <Subscription v-for="sub in cacheSubscription" :key="sub.id" :unsub="unSubscribe" :subscription="sub"/>
+        <Subscription v-for="sub in cacheSubscription" :key="sub.id"  :subscription="sub"/>
       </div>
     </div>
     <div class="ctrl-view-right">
@@ -67,15 +70,19 @@ export default {
       chatRecords: [],
       mq: new MessageQueue(),
       loading: false,
+      isActive: false
     }
   },
   methods: {
     changeLoadingState(bool = false) {
       this.loading = bool;
     },
+    changeActiveState(bool = false){
+      this.isActive = bool;
+    },
     async switchConnect() {
       this.changeLoadingState(true);
-      if (!this.mq.isActive()) {
+      if (!this.isActive) {
         await this.connect();
       } else {
         await this.disconnect();
@@ -89,16 +96,39 @@ export default {
         port: this.connection.port,
         username: this.connection.username,
         password: this.connection.password,
-        token: this.connection.token
+        token: this.connection.token,
+        connectionListener: this.listenConnection
       });
       if (nc instanceof Error) {
         this.$notify.error({title: nc.message, message: '连接失败!!!'});
         return;
       }
+      this.changeActiveState(true);
       this.subscription();
     },
     async disconnect() {
       await this.mq.close();
+      this.changeActiveState();
+    },
+    listenConnection(status){
+      switch (status.type){
+        case 'pingTimer':
+          this.changeActiveState(true);
+          this.changeLoadingState(false);
+          break;
+        case 'disconnect':
+          this.changeActiveState(false);
+          this.changeLoadingState(false);
+          break;
+        case 'reconnect':
+          this.changeActiveState(false);
+          this.changeLoadingState(true);
+          break;
+        case 'reconnecting':
+          this.changeActiveState(false);
+          this.changeLoadingState(true);
+          break;
+      }
     },
     querySubjects() {
       this.cacheSubscription = JSON.parse(localStorage.getItem(this.connection.id)) || [];
@@ -107,13 +137,23 @@ export default {
     subscription(){
       let subscriptions = this.querySubjects();
       subscriptions.forEach(subscription => {
-        this.mq.sub(subscription.topic , (data ,msg) => {
-          console.log(data , msg ,msg.subject);
-        })
-      })
-
-      this.mq.sub('>' , (data ,msg) => {
-        this.renderChatWindow(msg.subject , 'sub' , data)
+        this.subscribe(subscription);
+      });
+    },
+    addSubscribe(subscription){
+      let subscriptions = this.querySubjects().filter(sub => sub.topic === subscription.topic);
+      if (subscriptions.length > 0){
+        this.$notify.error({title:'错误' ,message:`主题[${subscription.topic}]已订阅`})
+        return false;
+      }
+      subscription.id = nanoid();
+      this.cacheSubscription.push(subscription);
+      this.subscribe(subscription);
+      return true;
+    },
+    subscribe(subscription){
+      this.mq.sub(subscription.topic , (data ,msg) => {
+        this.renderChatWindow(msg.subject ,'sub' ,data);
       })
     },
     publishData(publication, cb) {
@@ -151,7 +191,6 @@ export default {
         this.$refs.chatWindow.scrollTop = this.$refs.chatWindow.scrollHeight
       })
     },
-
     openSubscriptionDialog() {
       this.$refs.addSub.isPop = true;
     },
@@ -159,10 +198,12 @@ export default {
       return moment().format('HH:mm:ss');
     }
   },
+  mounted() {
+    this.querySubjects();
+  },
   watch: {
     cacheSubscription: {
       deep: true,
-      immediate: true,
       handler(value) {
         localStorage.setItem(this.connection.id, JSON.stringify(value))
       }

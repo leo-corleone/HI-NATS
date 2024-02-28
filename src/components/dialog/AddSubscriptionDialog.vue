@@ -37,7 +37,7 @@ import {validateTopic} from "@/utils/Validator";
 
 export default {
   name: "AddSubscriptionDialog",
-  props: ['connectionId' ,'subscribe'],
+  props: ['connectionId' ,'addSubscribe'],
   data() {
     return {
       isPop: false,
@@ -65,7 +65,7 @@ export default {
     submitSubscribe() {
       this.validateForm(() => {
         this.changeLoadingState()
-        let re = this.subscribe(JSON.parse(JSON.stringify(this.subscription)));
+        let re = this.addSubscribe(JSON.parse(JSON.stringify(this.subscription)));
         if (re){
           this.isPop = false;
         }

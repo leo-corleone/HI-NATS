@@ -104,7 +104,14 @@ class MessageQueue {
     }
 
     decode = (data) => {
-        return data === null ? data : this.sc.decode(data);
+        if (data === null) {
+            return '';
+        }
+        if (typeof data === 'object') {
+            return this.codec.decode(data);
+        } else {
+            return this.sc.decode(data);
+        }
     }
 
     close = async () => {

@@ -11,8 +11,7 @@
            clearable
            size="mini"
            class="ctrl-panel-tool-input"
-           :disabled="inputDisabled"
-       >
+           :disabled="inputDisabled">
        </el-input>
        <el-button @click="openConnectionDialog" size="mini" icon="el-icon-plus" type="primary" round></el-button>
      </div>

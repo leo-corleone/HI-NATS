@@ -25,7 +25,7 @@ export default {
     line-height: 30px;
     margin-bottom: 1px;
     border-radius: 10px;
-    border: 1px gray solid;
+    border: 1px #837e7e solid;
   }
 
   .subscription-warp span{
