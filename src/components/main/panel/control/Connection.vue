@@ -1,28 +1,26 @@
 <template>
   <div class="connect-warp">
     <div>
-      <EditConnectionDialog :config="connection" ref="editConnection"/>
+      <EditConnectionDialog :config="connection" :editConnection="editConnection" ref="editConnection"/>
     </div>
     <div class="connect-warp-outer">
-      <el-tooltip class="item" effect="dark" :content="state === 1 ? '已连接' : '未连接'" placement="left-end">
-        <div class="connect-warp-icon" :style="state === 1 ? 'color:green': 'color:red'">
+      <div class="connect-warp-icon" :style="this.connection.id === this.selectedConnection ? 'color:green' : 'color:red'">
           <i class="el-icon-cloudy"></i>
-        </div>
-      </el-tooltip>
+      </div>
       <el-tooltip class="item" effect="dark" :content="contentToolTip" placement="left-end">
         <div class="connect-warp-content ellipsis el-badge">
           {{ connection.name }}@{{ connection.host }}:{{ connection.port }}
         </div>
       </el-tooltip>
       <div class="connect-warp-ctrl">
-        <el-tooltip class="item" effect="dark" :content="state === 1 ? '点击断开' : '点击连接'" placement="top-start">
-          <div :style="state === 1 ? 'color:red':'color:green'" :class="isLoading ? 'el-icon-loading' : 'el-icon-switch-button'" @click.stop="connect"></div>
+        <el-tooltip class="item" effect="dark" content="控制台" placement="top-start">
+          <div class="el-icon-data-board" style="color: #53e844" @click.stop="ctrlDashboard"></div>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" content="编辑连接" placement="top-start">
-          <div class="el-icon-setting" @click.stop="editConnection"></div>
+          <div class="el-icon-setting"  @click.stop="openEditConnection"></div>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" content="点击删除" placement="top-start">
-          <div class="el-icon-delete" @click.stop="deleteConnection"></div>
+          <div class="el-icon-delete" style="color: #e82323" @click.stop="deleteConnection"></div>
         </el-tooltip>
       </div>
     </div>
@@ -30,78 +28,22 @@
 </template>
 
 <script>
-import MessageQueue from "@/utils/MessageQueue";
 import EditConnectionDialog from "@/components/dialog/EditConnectionDialog.vue";
-import {EventConstant} from "@/busEvent/EventConstant";
 
 export default {
   name: "Connection",
-  props: ['connection','returnToTab' ,'disconnection'],
+  props: ['connection','returnToTab' ,'removeConnection' ,'editConnection' ,'selectedConnection' , 'tabsMap'],
   components:{
     EditConnectionDialog
   },
-  data() {
-    return {
-      // -1: 未连接 , 0:正在重连 , 1:已连接
-      state: -1,
-      client: new MessageQueue(),
-      isLoading: false,
-      status: null,
-      cacheSubscription:JSON.parse(localStorage.getItem(this.connection.id)) || [],
-      subscription:{
-        id:null,
-        color: null,
-        topic:null
-      }
-    }
-  },
   methods: {
-    async connect() {
-      if (this.isLoading) {
-        if (this.state === 0){
-          this.$notify.warning('正在重连!!!');
-        }else {
-          this.$notify.warning('正在连接!!!');
-        }
-        return;
-      }
-      if (this.isActive()) {
-        this.disconnection(this.connection.id);
-        this.close();
-        return;
-      }
-      this.isLoading = true;
-      const nc = await this.client.conn({
-        name: this.connection.name,
-        token: this.connection.token,
-        user: this.connection.username,
-        pass: this.connection.password,
-        host: this.connection.host,
-        port: this.connection.port,
-        noEcho: false,
-        connectionListener: this.connectionListener,
-      });
-      if (nc instanceof Error) {
-        this.state = -1;
-        this.$notify.error({title: '连接失败', message: nc.message})
-      } else {
-        this.state = 1;
-        this.returnToTab(this.connection);
-      }
-      this.isLoading = false;
+    ctrlDashboard() {
+      this.returnToTab(this.connection);
     },
-    async editConnection() {
-      if (this.isActive()){
-        let result = await this.$confirm('此操作将会断开连接, 是否继续?' , '提示',{
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).catch(err => err);
-        if (result === 'confirm'){
-          this.close();
-        }else {
-          return;
-        }
+    openEditConnection() {
+      if (this.tabsMap.has(this.connection.id)){
+        this.$notify.warning({ title: '警告' , message:'控制台打开时,无法编辑连接'})
+        return;
       }
       this.$refs.editConnection.isPop = true;
     },
@@ -112,110 +54,13 @@ export default {
         type: 'error'
       }).catch(err => err);
       if (result === 'confirm'){
-        this.$bus.$emit(EventConstant.DELETE_CONNECTION , this.connection.id);
+        this.removeConnection(this.connection);
       }
-    },
-    connectionListener(status) {
-      this.status = status;
-    },
-    isActive(){
-      return this.client.isActive();
-    },
-    close(){
-      this.client.close().then(()=>{
-        this.state = -1
-      });
-    },
-    unsubscribeAllTopic() {
-      if (!this.client.isActive()){
-        return;
-      }
-      this.cacheSubscription = JSON.parse(localStorage.getItem(this.connection.id)) || [];
-      this.cacheSubscription.forEach(subscription => {
-        this.client.unsub(subscription.topic);
-      });
-    },
-    subscribeAllTopic(fn){
-      if (!this.client.isActive()){
-        return;
-      }
-      this.cacheSubscription = JSON.parse(localStorage.getItem(this.connection.id)) || [];
-      this.cacheSubscription.forEach(subscription => {
-        this.client.sub(subscription.topic , (data)=>{
-           fn(subscription.topic ,'sub', data);
-        });
-      })
-    },
-    subscribe(subscription ,fn){
-      if (!this.isActive()){
-        this.$notify.error("未连接,无法订阅");
-        return;
-      }
-      this.client.sub(subscription.topic , (data)=>{
-        fn(subscription.topic ,'sub' , data);
-      });
-    },
-    unSubscribe(subscription){
-      this.client.unsub(subscription.topic);
-    },
-    publish(publication , cb){
-      if (!this.isActive()){
-        this.$notify.error('服务未连接');
-        cb && cb();
-        return
-      }
-      this.client.pub(publication.topic , publication.data)
-      cb && cb();
-    },
-    async request(request , cb){
-      if (!this.isActive()){
-        this.$notify.error('服务未连接');
-        cb && cb(null);
-        return
-      }
-      let re = await this.client.req(request.topic , request.data)
-      cb && cb(re);
     }
-  },
-  mounted() {
-    this.$bus.$on(EventConstant.UNSUBSCRIBE_ALL  + this.connection.id , this.unsubscribeAllTopic);
-    this.$bus.$on(EventConstant.UNSUBSCRIBE  + this.connection.id , this.unSubscribe);
-    this.$bus.$on(EventConstant.SUBSCRIBE_ALL  + this.connection.id , this.subscribeAllTopic);
-    this.$bus.$on(EventConstant.SUBSCRIBE  + this.connection.id , this.subscribe);
-    this.$bus.$on(EventConstant.REQUEST + this.connection.id , this.request);
-    this.$bus.$on(EventConstant.PUBLICATION + this.connection.id , this.publish);
-  },
-  beforeDestroy() {
-    this.close();
   },
   computed: {
     contentToolTip() {
       return this.connection.name + "@" + this.connection.host + ":" + this.connection.port;
-    },
-  },
-  watch: {
-    status: {
-      handler(status) {
-         switch (status.type){
-           case 'pingTimer':
-             this.state = 1;
-             break;
-           case 'reconnecting' :
-             this.state = 0;
-             break;
-           case 'reconnect':
-             this.state = 0;
-             break;
-           case  'disconnect':
-             this.state = -1;
-             break;
-         }
-      }
-    },
-    state:{
-      handler(s){
-        this.isLoading = s === 0;
-      }
     }
   }
 }
@@ -257,7 +102,7 @@ export default {
 .connect-warp-content {
   height: 100%;
   width: calc(50% - 10px);
-  margin: 0 auto 0 10px;
+  margin: 0 auto 0 2px;
   overflow: hidden;
 }
 
@@ -276,11 +121,4 @@ export default {
   justify-content: center;
 }
 
-.connect-warp-ctrl div:hover {
-  color: rgba(7, 239, 7, 0.66);
-}
-
-.connect-warp-ctrl div:last-child:hover {
-  color: rgba(239, 15, 7, 0.66);
-}
 </style>

@@ -43,7 +43,6 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
     <el-button @click="submitEdit" type="primary" size="small" round>确 定</el-button>
-    <el-button @click="connectTest" type="success" round size="small">测 试 连 接</el-button>
   </span>
     </el-dialog>
   </div>
@@ -51,11 +50,10 @@
 
 <script>
 import {isPort, validateIP} from "@/utils/Validator";
-import {EventConstant} from "@/busEvent/EventConstant";
 
 export default {
   name: "EditConnectionDialog",
-  props: ['config'],
+  props: ['config' ,'editConnection'],
   data() {
     return {
       isPop: false,
@@ -76,15 +74,9 @@ export default {
     }
   },
   methods: {
-    connectTest() {
-      this.validateForm(() => {
-        this.loading = true;
-        this.$bus.$emit(EventConstant.TEST_CONNECTION, this.editConfig, () => this.loading = false);
-      })
-    },
     submitEdit() {
       this.validateForm(() => {
-        this.$bus.$emit(EventConstant.EDIT_CONNECTION, JSON.parse(JSON.stringify(this.editConfig)));
+        this.editConnection(JSON.parse(JSON.stringify(this.editConfig)))
         this.isPop = false;
       })
     },

@@ -54,7 +54,7 @@ class MessageQueue {
             const subscription = this.nc.subscribe(topic,
                 {
                     callback: (err, msg) => {
-                        const result = fun(this.decode(msg.data));
+                        const result = fun(this.decode(msg.data),msg);
                         if (msg.reply != null) {
                             msg.respond(this.encode(result))
                         }

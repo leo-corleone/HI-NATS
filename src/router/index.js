@@ -22,17 +22,17 @@ const router = new VueRouter({
     routes: [
         {
             name: "controlPanel",
-            path: '/controlPanel',
+            path: '/control',
             component: ControlPanel,
         },
         {
             name: "monitorPanel",
-            path: '/monitorPanel',
+            path: '/monitor',
             component: MonitorPanel,
         },
         {
             name: "logPanel",
-            path: '/logPanel',
+            path: '/log',
             component: LogPanel,
         }
     ]

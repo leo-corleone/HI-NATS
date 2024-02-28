@@ -42,7 +42,6 @@
     <span slot="footer" class="dialog-footer">
     <el-button @click="reset" type="danger" size="small" round>重 置</el-button>
     <el-button @click="submitForm" type="primary" size="small" round>确 定</el-button>
-    <el-button @click="connectTest" type="success" round size="small" :loading="loading">测 试 连 接</el-button>
   </span>
   </el-dialog>
 </template>
@@ -54,6 +53,7 @@ import {nanoid} from "nanoid";
 
 export default {
   name: "NewConnectionDialog",
+  props:['addConnection'],
   data() {
     return {
       connection: {
@@ -91,7 +91,8 @@ export default {
     submitForm() {
       this.validateForm(() => {
         this.connection.id = nanoid();
-        this.$bus.$emit(EventConstant.ADD_CONNECTION, JSON.parse(JSON.stringify(this.connection)));
+        this.addConnection(JSON.parse(JSON.stringify(this.connection)));
+        // this.$bus.$emit(EventConstant.ADD_CONNECTION, JSON.parse(JSON.stringify(this.connection)));
         this.isPop = false;
       })
     },

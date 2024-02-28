@@ -1,6 +1,6 @@
 <template>
  <div class="ctrl-panel-wrap">
-   <NewConnectionDialog ref="connectDialog"></NewConnectionDialog>
+   <NewConnectionDialog ref="connectDialog" :addConnection="addConnection"></NewConnectionDialog>
    <div class="ctrl-panel-left">
      <div class="ctrl-panel-tool">
        <el-input
@@ -17,13 +17,20 @@
        <el-button @click="openConnectionDialog" size="mini" icon="el-icon-plus" type="primary" round></el-button>
      </div>
      <div class="ctrl-panel-left-bottom">
-       <Connection :ref="conn.id"  v-for="conn in connections" :disconnection="disconnection" :returnToTab="returnToTab" :connection="conn" :key="conn.id"/>
+       <Connection :ref="conn.id"  v-for="conn in connections"
+                   :removeConnection="removeConnection"
+                   :editConnection="editConnection"
+                   :returnToTab="returnToTab"
+                   :connection="conn"
+                   :selectedConnection="tabName"
+                   :tabsMap="tabsMap"
+                   :key="conn.id"/>
      </div>
    </div>
    <div class="ctrl-panel-right">
      <el-tabs  v-model="tabName" type="card" closable @edit="handleTabsEdit" style="width:100%;height: 100%">
        <el-tab-pane :key="item.name" v-for="item in connectionTabs" :label="item.title" :name="item.name" style="width: 100%;height: 100%">
-         <span slot="label"><i class="el-icon-user"></i> {{item.name}}</span>
+         <span slot="label"><i class="el-icon-menu"></i> {{item.title}}</span>
          <ControlDashboard :connection="item.connection"/>
        </el-tab-pane>
      </el-tabs>
@@ -33,8 +40,6 @@
 
 <script>
 import NewConnectionDialog from "@/components/dialog/NewConnectionDialog.vue";
-import {EventConstant} from "@/busEvent/EventConstant";
-import MessageQueue from "@/utils/MessageQueue";
 import Connection from "@/components/main/panel/control/Connection.vue";
 import ControlDashboard from "@/components/main/panel/control/ControlDashboard.vue";
 
@@ -50,26 +55,12 @@ export default {
       searchKey:'',
       connections:[],
       cacheConnections:JSON.parse(localStorage.getItem('connections')) || [],
-      connection: null,
-      client: null,
       tabName:"",
       connectionTabs:[],
-      tabIndex: 0,
+      tabsMap: new Map(),
     }
   },
   methods:{
-    testConnection(config , callback){
-      const mq = new MessageQueue();
-      mq.conn(config).then(nc => {
-        if (nc instanceof Error){
-          this.$notify.error({title:'连接失败' , message:nc.message})
-        }else {
-          this.$notify.success('连接成功')
-          nc.close();
-        }
-        callback();
-      });
-    },
     openConnectionDialog() {
       this.$refs.connectDialog.isPop = true;
     },
@@ -101,31 +92,39 @@ export default {
         })
       }
     },
+    removeConnection(connection){
+      this.deleteConnection(connection.id);
+      this.removeTab(connection.id);
+      this.tabsMap.delete(connection.id);
+    },
     returnToTab(connection){
-        this.connectionTabs.push({
-          title: connection.name,
-          name: connection.id,
-          connection,
-        });
+        if (!this.tabsMap.has(connection.id)){
+          this.connectionTabs.push({
+            title: connection.name,
+            name: connection.id,
+            connection,
+          });
+          this.tabsMap.set(connection.id , connection);
+        }
         this.tabName = connection.id;
     },
-    disconnection(uid){
-      if (this.connection && this.connection.id === uid){
-        this.connection = null;
+    removeTab(connectionId){
+      if (this.tabsMap.has(connectionId)){
+        this.connectionTabs = this.connectionTabs.filter(tab => tab.name !== connectionId);
+        this.tabsMap.delete(connectionId);
+        if (connectionId === this.tabName && this.tabsMap.size > 0){
+          this.tabName = this.connectionTabs[0].name;
+        }
+        if (connectionId === this.tabName && this.tabsMap.size === 0){
+          this.tabName = "";
+        }
       }
     },
     handleTabsEdit(target , action){
-      console.log(target , action)
+      if (action === 'remove'){
+        this.removeTab(target)
+      }
     }
-  },
-  mounted() {
-    this.$bus.$on(EventConstant.ADD_CONNECTION , this.addConnection);
-    this.$bus.$on(EventConstant.TEST_CONNECTION , this.testConnection);
-    this.$bus.$on(EventConstant.EDIT_CONNECTION , this.editConnection);
-    this.$bus.$on(EventConstant.DELETE_CONNECTION , this.deleteConnection);
-  },
-  beforeDestroy() {
-    this.$off([EventConstant.EDIT_CONNECTION , EventConstant.TEST_CONNECTION , EventConstant.ADD_CONNECTION , EventConstant.DELETE_CONNECTION]);
   },
   computed: {
     inputDisabled(){
