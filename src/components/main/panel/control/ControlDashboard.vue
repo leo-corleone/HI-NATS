@@ -239,6 +239,9 @@ export default {
   mounted() {
     this.querySubjects();
   },
+  async beforeDestroy() {
+    await this.disconnect();
+  },
   watch: {
     cacheSubscription: {
       deep: true,

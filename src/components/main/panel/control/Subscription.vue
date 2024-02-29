@@ -18,9 +18,6 @@ export default {
     switchSubscribe(){
 
     }
-  },
-  mounted() {
-    console.log(this.subscription)
   }
 }
 </script>
