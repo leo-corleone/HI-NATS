@@ -21,7 +21,7 @@
                      @click="switchConnect"
                      :type="isActive ? 'danger' : 'success'"
                      size="mini"
-                     plain> {{isActive ? '取消连接' : '连接'}}
+                     plain> {{isActive ? '断开连接' : '连接'}}
           </el-button>
         </div>
       </div>

@@ -48,7 +48,6 @@
 
 <script>
 import {isPort, validateIP} from "@/utils/Validator";
-import {EventConstant} from "@/busEvent/EventConstant";
 import {nanoid} from "nanoid";
 
 export default {
@@ -82,17 +81,10 @@ export default {
     }
   },
   methods: {
-    connectTest() {
-      this.validateForm(() => {
-        this.loading = true;
-        this.$bus.$emit(EventConstant.TEST_CONNECTION, this.connection, () => this.loading = false);
-      })
-    },
     submitForm() {
       this.validateForm(() => {
         this.connection.id = nanoid();
         this.addConnection(JSON.parse(JSON.stringify(this.connection)));
-        // this.$bus.$emit(EventConstant.ADD_CONNECTION, JSON.parse(JSON.stringify(this.connection)));
         this.isPop = false;
       })
     },
