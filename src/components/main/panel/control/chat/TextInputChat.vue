@@ -12,7 +12,10 @@
           <el-input size="mini" style="width: 400px" v-model="publication.topic" placeholder=""></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button size="mini" type="primary" @click="dispatcher" :loading="loading" :disabled="!isActive">确认</el-button>
+          <el-button size="mini" type="primary" @click="dispatcher" :loading="loading" :disabled="!isActive" icon="el-icon-position">确认</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button size="mini" type="warning" icon="el-icon-refresh" @click="clearChatWindow">清空</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -28,7 +31,7 @@
 
 export default {
   name: "TextInputChat",
-  props:['publish' ,'request' ,'isActive'],
+  props:['publish' ,'request' ,'isActive' ,'clearChatWindow'],
   data(){
     return {
       publication:{

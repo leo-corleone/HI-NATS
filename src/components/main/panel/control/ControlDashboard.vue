@@ -40,7 +40,7 @@
         </div>
         <el-divider class="ctrl-view-right-drag-bar"/>
         <div class="ctrl-view-right-wrap-input">
-          <TextInputChat :publish="publish" :request="request" :isActive="isActive"/>
+          <TextInputChat :publish="publish" :request="request" :clearChatWindow="clearChatWindow" :isActive="isActive"/>
         </div>
       </div>
     </div>
@@ -215,6 +215,9 @@ export default {
       }
       this.pushRecord(chatRecord);
       this.refreshScrollView();
+    },
+    clearChatWindow(){
+      this.chatRecords = [];
     },
     pushRecord(record) {
       this.chatRecords.push(record);
