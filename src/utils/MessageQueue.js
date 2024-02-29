@@ -1,4 +1,4 @@
-import {connect, JSONCodec, StringCodec} from "nats.ws";
+import {connect, JSONCodec, StringCodec, ErrorCode, NatsError} from "nats.ws";
 
 
 class MessageQueue {
@@ -8,6 +8,16 @@ class MessageQueue {
         this.sc = new StringCodec();
         this.codec = new JSONCodec();
         this.nc = null;
+        this.errorMsg = new Map();
+        this.initErrorCode();
+    }
+
+    initErrorCode = () => {
+        for (let key in ErrorCode) {
+            if (!this.errorMsg.has(ErrorCode[key])){
+                this.errorMsg.set(ErrorCode[key] , key);
+            }
+        }
     }
 
     conn = async (config) => {
@@ -120,6 +130,15 @@ class MessageQueue {
 
     isActive = () => {
        return this.nc ? !this.nc.isClosed() : false;
+    }
+
+    error = (err) => {
+       if (err instanceof NatsError){
+          if (this.errorMsg.has(err.message)){
+              return new NatsError(this.errorMsg.get(err.message) , err.code , err);
+          }
+       }
+       return new NatsError('UnKnownError' , '-1' , err);
     }
 }
 

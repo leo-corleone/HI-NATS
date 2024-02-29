@@ -58,6 +58,7 @@ import TextInputChat from "@/components/main/panel/control/chat/TextInputChat.vu
 import RequestChat from "@/components/main/panel/control/chat/RequestChat.vue";
 import MessageQueue from "@/utils/MessageQueue";
 
+
 export default {
   name: "ControlDashboard",
   props: ['connection'],
@@ -197,11 +198,12 @@ export default {
         this.$notify.error({title:'错误' ,message:'客户端未连接'});
         return
       }
-      const result = await this.mq.req(request.topic , request.data);
+      let result = await this.mq.req(request.topic , request.data);
       cb && cb();
       if (result instanceof Error) {
-        this.$notify.error(result.message);
-        return null;
+        result = this.mq.error(result);
+        this.$notify.error({title:"错误" , message: result.message});
+        return;
       }
       this.renderChatWindow(request.topic, request.type, result);
     },

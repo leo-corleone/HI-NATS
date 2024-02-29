@@ -1,4 +1,11 @@
-const subCache = new Map();
-subCache.set('111' ,()=>{});
+import {ErrorCode} from "nats.ws";
 
-console.log(subCache.has("111"))
+const errorMap = new Map();
+
+for (let key in ErrorCode) {
+    if (!errorMap.has(ErrorCode[key])){
+        errorMap.set(ErrorCode[key] , key);
+    }
+}
+
+console.log(errorMap);
