@@ -107,11 +107,7 @@ class MessageQueue {
         if (data === null) {
             return '';
         }
-        if (typeof data === 'object') {
-            return this.codec.decode(data);
-        } else {
-            return this.sc.decode(data);
-        }
+        return  this.sc.decode(data);
     }
 
     close = async () => {

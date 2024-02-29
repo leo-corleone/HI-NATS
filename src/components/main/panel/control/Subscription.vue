@@ -1,19 +1,26 @@
 <template>
- <div class="subscription-warp">
+ <div class="subscription-warp" :style="{'border-radius': '5px','border':`1px solid ${subscription.color}`}">
    <span class="ellipsis subscription-ident" :style="'background-color:' + subscription.color"></span>
    <span class="ellipsis subscription-content" :style=" 'color:' + subscription.color">{{subscription.topic}}</span>
-   <span class="subscription-delete el-icon-circle-close" @click="removeSubscription"></span>
+<!--   <span class="subscription-delete el-icon-collection-tag" :style="{color: subscription.isSub ? 'red' : 'green'}" v-show="isActive" @click="switchSubscribe"></span>-->
+   <span class="subscription-delete el-icon-close" @click="removeSubscription"></span>
  </div>
 </template>
 
 <script>
 export default {
   name: "Subscription",
-  props:['subscription' , 'unsub'],
+  props:['subscription' , 'removeSubscribe' , 'isActive'],
   methods:{
     removeSubscription(){
-      this.unsub(this.subscription);
+      this.removeSubscribe(this.subscription);
+    },
+    switchSubscribe(){
+
     }
+  },
+  mounted() {
+    console.log(this.subscription)
   }
 }
 </script>
@@ -24,7 +31,7 @@ export default {
     height: 30px;
     line-height: 30px;
     margin-bottom: 1px;
-    border-radius: 10px;
+    border-radius: 5px;
     border: 1px #837e7e solid;
   }
 
@@ -43,7 +50,7 @@ export default {
   .subscription-warp .subscription-content{
     opacity: 1;
     font-size: small;
-    width: 70%;
+    width: 80%;
     height: 100%;
   }
 

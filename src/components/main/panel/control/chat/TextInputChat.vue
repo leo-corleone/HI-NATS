@@ -12,7 +12,7 @@
           <el-input size="mini" style="width: 400px" v-model="publication.topic" placeholder=""></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button size="mini" type="primary" @click="dispatcher" :loading="loading">确认</el-button>
+          <el-button size="mini" type="primary" @click="dispatcher" :loading="loading" :disabled="!isActive">确认</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -28,7 +28,7 @@
 
 export default {
   name: "TextInputChat",
-  props:['publishData' ,'requestData'],
+  props:['publish' ,'request' ,'isActive'],
   data(){
     return {
       publication:{
@@ -50,11 +50,11 @@ export default {
       }
       this.changeState(true);
       if (this.publication.type === 'req'){
-        this.requestData(this.publication , ()=>{
+        this.request(this.publication , ()=>{
           this.changeState();
         })
       }else {
-        this.publishData(this.publication , ()=>{
+        this.publish(this.publication , ()=>{
           this.changeState();
         });
       }

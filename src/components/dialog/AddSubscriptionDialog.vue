@@ -46,6 +46,7 @@ export default {
         id: '',
         color: '#409EFF',
         topic: '',
+        isSub: true,
       },
       rules: {
         topic: [

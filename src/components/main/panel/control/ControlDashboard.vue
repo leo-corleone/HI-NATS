@@ -10,6 +10,12 @@
                      :disabled="!isActive"
                      plain> 订阅
           </el-button>
+          <el-button class="el-icon-circle-close"
+                     @click="clearSubscribe"
+                     :disabled="! cacheSubscription.length > 0"
+                     type="danger" size="mini"
+                     plain> 清除订阅
+          </el-button>
           <el-button class="el-icon-switch-button"
                      :loading="loading"
                      @click="switchConnect"
@@ -20,7 +26,7 @@
         </div>
       </div>
       <div class="ctrl-view-left-subs infinite-list" style="overflow-y:auto">
-        <Subscription v-for="sub in cacheSubscription" :key="sub.id"  :subscription="sub"/>
+        <Subscription v-for="subscription in cacheSubscription" :key="subscription.id" :removeSubscribe="removeSubscribe" :isActive="isActive"  :subscription="subscription"/>
       </div>
     </div>
     <div class="ctrl-view-right">
@@ -34,7 +40,7 @@
         </div>
         <el-divider class="ctrl-view-right-drag-bar"/>
         <div class="ctrl-view-right-wrap-input">
-          <TextInputChat :publish-data="publishData" :request-data="requestData"/>
+          <TextInputChat :publish="publish" :request="request" :isActive="isActive"/>
         </div>
       </div>
     </div>
@@ -43,7 +49,6 @@
 
 <script>
 import Subscription from "@/components/main/panel/control/Subscription.vue";
-import {EventConstant} from "@/busEvent/EventConstant";
 import AddSubscriptionDialog from "@/components/dialog/AddSubscriptionDialog.vue";
 import {nanoid} from "nanoid";
 import PublishChat from "@/components/main/panel/control/chat/PublishChat.vue";
@@ -156,21 +161,49 @@ export default {
         this.renderChatWindow(msg.subject ,'sub' ,data);
       })
     },
-    publishData(publication, cb) {
-      this.$bus.$emit(EventConstant.PUBLICATION + this.connection.id, publication, () => {
-        cb && cb();
-        this.renderChatWindow(publication.topic, publication.type, publication.data);
-      })
+    removeSubscribe(subscription){
+      this.cacheSubscription = this.querySubjects();
+      if (this.isActive){
+        this.cacheSubscription.forEach(sub => {
+          if (sub.id === subscription.id){
+            this.mq.unsub(subscription.topic);
+          }
+        });
+      }
+      this.cacheSubscription = this.cacheSubscription.filter(sub => sub.id !== subscription.id);
     },
-    requestData(request, cb) {
-      this.$bus.$emit(EventConstant.REQUEST + this.connection.id, request, (data) => {
+    clearSubscribe(){
+      this.cacheSubscription = this.querySubjects();
+      if (this.isActive){
+        this.cacheSubscription.forEach(sub => {
+            this.mq.unsub(sub.topic);
+        });
+      }
+      this.cacheSubscription = [];
+    },
+    publish(publication, cb) {
+      if (!this.isActive){
         cb && cb();
-        if (data instanceof Error) {
-          this.$notify.error(data.message);
-          return null;
-        }
-        this.renderChatWindow(request.topic, request.type, data);
-      })
+        this.$notify.error({title:'错误' ,message:'客户端未连接'});
+        return
+      }
+      this.mq.pub(publication.topic , publication.data);
+      this.renderChatWindow(publication.topic, publication.type, publication.data);
+      cb && cb();
+    },
+    async request(request, cb) {
+      if (!this.isActive){
+        cb && cb();
+        this.$notify.error({title:'错误' ,message:'客户端未连接'});
+        return
+      }
+      const result = await this.mq.req(request.topic , request.data);
+      cb && cb();
+      if (result instanceof Error) {
+        this.$notify.error(result.message);
+        return null;
+      }
+      this.renderChatWindow(request.topic, request.type, result);
     },
     renderChatWindow(topic, type, data) {
       let chatRecord = {
