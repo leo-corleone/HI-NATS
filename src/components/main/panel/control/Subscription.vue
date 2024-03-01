@@ -1,5 +1,5 @@
 <template>
- <div class="subscription-warp" :style="{'border-radius': '5px','border':`1px solid ${subscription.color}`}">
+ <div class="subscription-warp" :style="{'border-radius': '15px','border':`1px solid ${subscription.color}`}">
    <span class="ellipsis subscription-ident" :style="'background-color:' + subscription.color"></span>
    <span class="ellipsis subscription-content" :style=" 'color:' + subscription.color">{{subscription.topic}}</span>
 <!--   <span class="subscription-delete el-icon-collection-tag" :style="{color: subscription.isSub ? 'red' : 'green'}" v-show="isActive" @click="switchSubscribe"></span>-->
@@ -25,10 +25,10 @@ export default {
 <style scoped>
   .subscription-warp{
     width: calc(100% - 2px);
-    height: 30px;
-    line-height: 30px;
+    height: 40px;
+    line-height: 40px;
     margin-bottom: 1px;
-    border-radius: 5px;
+    border-radius: 20px;
     border: 1px #837e7e solid;
   }
 
@@ -55,7 +55,7 @@ export default {
     color: #ee0d0d;
     font-size: large;
     width: 20px;
-    margin-top: 5px;
+    margin-top: 10px;
     margin-left: 5px;
   }
 </style>
