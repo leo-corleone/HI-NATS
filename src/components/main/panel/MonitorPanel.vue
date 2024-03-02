@@ -1,13 +1,17 @@
 <template>
  <div class="monitor-panel-wrap">
-   <el-empty description="敬请期待"></el-empty>
+   <MonitorHeader/>
  </div>
 </template>
 
 <script>
+
+import MonitorHeader from "@/components/main/panel/monitor/MonitorHeader.vue";
 export default {
   name: "MonitorPanel",
-  props:['admin','isUser']
+  components:{
+    MonitorHeader
+  }
 }
 </script>
 

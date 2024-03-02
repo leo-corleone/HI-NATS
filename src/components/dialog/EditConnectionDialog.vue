@@ -3,7 +3,7 @@
     <el-dialog title="编辑连接" width="25%" custom-class="connection-dialog" :close-on-click-modal="false" center
                :visible.sync="isPop">
       <el-form :model="editConfig" ref="editForm" :rules="rules" label-width="80px"
-               style="height: 300px; text-align: center">
+               style="height: 330px; text-align: center">
         <el-form-item label="连接名" required prop="name">
           <el-input clearable
                     size="mini" prefix-icon="el-icon-user" placeholder="请输入连接名"
@@ -26,7 +26,24 @@
                         placeholder="请输入端口"></el-input>
             </el-form-item>
           </el-col>
-
+        </el-form-item>
+        <el-form-item label="监控地址">
+          <el-col :span="14">
+            <el-form-item prop="monitorHost">
+              <el-input clearable
+                        size="mini" v-model="editConfig.monitorHost" placeholder="请输入地址" style="width: 100%;">
+                <template slot="prefix">http</template>
+              </el-input>
+            </el-form-item>
+          </el-col>
+          <el-col class="line" :span="1">:</el-col>
+          <el-col :span="9">
+            <el-form-item prop="monitorPort">
+              <el-input clearable
+                        size="mini" v-model.number="editConfig.monitorPort" style="width: 100%;"
+                        placeholder="请输入端口"></el-input>
+            </el-form-item>
+          </el-col>
         </el-form-item>
         <el-form-item label="用户名" prop="username">
           <el-input clearable
@@ -49,7 +66,7 @@
 </template>
 
 <script>
-import {isPort, validateIP} from "@/utils/Validator";
+import {isMonitorPort, isPort, validateIP, validateMonitorIP} from "@/utils/Validator";
 
 export default {
   name: "EditConnectionDialog",
@@ -69,6 +86,12 @@ export default {
         ],
         port: [
           {validator: isPort, trigger: ['blur', 'change']},
+        ],
+        monitorHost: [
+          {validator: validateMonitorIP, trigger: ['blur', 'change']},
+        ],
+        monitorPort: [
+          {validator: isMonitorPort, trigger: ['blur', 'change']},
         ]
       }
     }

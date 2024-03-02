@@ -14,7 +14,7 @@
             <span slot="title">连接</span>
           </el-menu-item>
           <el-menu-item index="2" @click="switchCtrlPanel('monitorPanel')">
-            <i class="el-icon-monitor"></i>
+            <i class="el-icon-data-line"></i>
             <span slot="title">监控</span>
           </el-menu-item>
           <el-menu-item index="3" @click="switchCtrlPanel('logPanel')">
@@ -47,9 +47,6 @@ export default {
     switchCollapse() {
       this.isCollapse = !this.isCollapse
     }
-  },
-  mounted() {
-
   }
 }
 </script>

@@ -53,7 +53,7 @@ export default {
     return {
       searchKey:'',
       connections:[],
-      cacheConnections:JSON.parse(localStorage.getItem('connections')) || [],
+      cacheConnections: JSON.parse(localStorage.getItem('connections')) || [],
       tabName:"",
       connectionTabs:[],
       tabsMap: new Map(),
@@ -75,6 +75,8 @@ export default {
           connection.username = config.username;
           connection.password = config.password;
           connection.token = config.token;
+          connection.monitorHost = config.monitorHost;
+          connection.monitorPort = config.monitorPort;
         }
       });
     },
