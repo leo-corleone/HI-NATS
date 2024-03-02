@@ -38,9 +38,9 @@ export default {
 
 <style scoped>
 .monitor-form-warp{
-  padding: 10px;
-  height: calc(100% - 20px);
-  width: calc(100% - 20px);
+  padding: 10px 0;
+  height: 50px;
+  width: calc(100%);
   /*background-color: #d7d3d3;*/
 }
 
