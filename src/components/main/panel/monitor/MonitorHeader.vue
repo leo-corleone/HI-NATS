@@ -39,7 +39,7 @@ export default {
 <style scoped>
 .monitor-form-warp{
   padding: 10px 0;
-  height: 50px;
+  height: 45px;
   width: calc(100%);
   /*background-color: #d7d3d3;*/
 }
@@ -47,11 +47,11 @@ export default {
 .monitor-form{
   margin-left: 10px;
   height: 45px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .monitor-header-divider{
-  margin: 2px 0;
+  margin: 1px 0;
 }
 
 </style>
