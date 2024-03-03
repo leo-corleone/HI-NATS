@@ -45,14 +45,12 @@ export default {
     setInterval(async ()=>{
       let result = await this.api.queryHealthProbe();
       this.status = result.status;
-      console.log(result);
       result = await this.api.queryGeneral();
-      console.log(result);
       this.version = result.version;
       this.uptime = result.uptime;
       this.serverName = result.server_name;
     }, 5000);
-
+    console.log(this);
   }
 }
 </script>
@@ -75,7 +73,7 @@ export default {
 .monitor-dashboard-status,
 .monitor-dashboard-server {
   width: 15%;
-  height: 15%;
+  height: 12%;
   padding: 3px;
   border-radius: 10px;
   background-color: #fdfdfd;

@@ -1,6 +1,6 @@
 import axios from "axios";
 export class Api {
-    constructor(prefix , schema) {
+    constructor(prefix = "http" , schema) {
         this.prefix = prefix;
         this.schema = schema;
     }
