@@ -38,8 +38,3 @@ export class Api {
     }
 }
 
-
-const api = new Api("http" ,'110.41.3.32:822')
-console.log(await api.queryGeneral());
-console.log(await api.queryConnections());
-console.log(await api.queryHealthProbe());
