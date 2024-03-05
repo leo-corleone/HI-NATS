@@ -108,6 +108,7 @@ export default {
   methods: {
     submitForm() {
       this.validateForm(() => {
+        console.log(this)
         this.connection.id = nanoid();
         this.addConnection(JSON.parse(JSON.stringify(this.connection)));
         this.isPop = false;
@@ -117,7 +118,7 @@ export default {
       this.$refs.newForm?.resetFields();
     },
     validateForm(fn) {
-      this.$refs.newForm.validate((valid) => {
+      this.$refs['newForm'].validate((valid) => {
         if (valid) {
           fn();
         } else {
