@@ -58,7 +58,7 @@ export default {
 <style scoped>
 .monitor-dashboard-wrap {
   background-color: #f1f3f1;
-  width: calc(100% - 10px);
+  width: calc(11% - 10px);
   height: calc(100% - 75px);
   border-radius: 10px;
   padding: 5px;
@@ -72,12 +72,13 @@ export default {
 .monitor-dashboard-uptime,
 .monitor-dashboard-status,
 .monitor-dashboard-server {
-  width: 15%;
+  width: 100%;
   height: 12%;
   padding: 3px;
   border-radius: 10px;
   background-color: #fdfdfd;
   margin-left: 5px;
+  margin-bottom: 10px;
 }
 
 .monitor-dashboard-version {
@@ -88,9 +89,12 @@ export default {
   width: 100%;
   height: 25%;
   border-bottom: 1px solid #f1f3f1;
+  background-color: burlywood;
+  color: white;
   text-align: center;
   align-items: center;
   margin: auto;
+  border-radius: 10px;
 }
 
 .monitor-content {
@@ -101,7 +105,7 @@ export default {
   align-items: center;
   background-color: #0d6e5b;
   border-radius: 10px;
-  font-size: 35px;
+  font-size: 20px;
   color: #f1f3f1;
 }
 </style>
