@@ -10,7 +10,7 @@ export default {
     return {
       time:[],
       total:[],
-      title: 'Memory',
+      title: 'Memory (KB)',
       chart: null,
     }
   },
