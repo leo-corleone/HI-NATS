@@ -1,29 +1,29 @@
 <template>
   <div class="monitor-connection-chart-wrap" id="connection-chart">
-    connections
   </div>
 </template>
 
 <script>
 export default {
   name: "ConnectionsChart",
-  props:['time' , 'count'],
   data(){
     return {
+      time:[],
+      count:[],
       title: 'Connections',
+      chart: null,
     }
   },
   methods:{
     initCharts(){
-      const chart = this.$echarts.init(document.getElementById("connection-chart"));
-      chart.setOption({
+      this.chart.setOption({
         title: {
           text: this.title,
-          left: 'center'
+              left: 'center'
         },
         xAxis: {
           type: 'category',
-          data: this.time
+              data: this.time
         },
         yAxis: {
           type: 'value'
@@ -37,8 +37,14 @@ export default {
         ]
       });
     },
+    freshChartData(time , count){
+      this.time = time;
+      this.count = count;
+      this.initCharts();
+    }
   },
   mounted() {
+    this.chart = this.$echarts.init(document.getElementById("connection-chart"));
     this.initCharts();
   }
 }

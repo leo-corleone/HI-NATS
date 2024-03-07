@@ -10,7 +10,8 @@ export class Api {
             method: "get",
             url: `${this.prefix}://${this.schema}${uri}`,
             params,
-            timeout: 10 * 1000
+            timeout: 10 * 1000,
+            withCredentials: false
         }).then(response => response.data)
             .catch(err => err);
     }

@@ -1,11 +1,7 @@
-import {ErrorCode} from "nats.ws";
+let a = new Array()
+a.push(1)
+a.push(2)
+a.push(3)
+a.shift()
+console.log(a)
 
-const errorMap = new Map();
-
-for (let key in ErrorCode) {
-    if (!errorMap.has(ErrorCode[key])){
-        errorMap.set(ErrorCode[key] , key);
-    }
-}
-
-console.log(errorMap);

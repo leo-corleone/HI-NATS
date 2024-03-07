@@ -48,7 +48,7 @@
     </div>
     <div class="monitor-dashboard-right">
       <div class="monitor-dashboard-dynamic">
-        <ConnectionsChart :time="connection.time" :count="connection.count" />
+        <ConnectionsChart ref="connectionsChart"/>
       </div>
       <div class="monitor-dashboard-dynamic">
         <MemoryChart/>
@@ -73,7 +73,7 @@ import moment from "moment";
 
 export default {
   name: "MonitorDashboard",
-  components:{
+  components: {
     ConnectionsChart,
     MemoryChart,
     ByteChart,
@@ -82,6 +82,8 @@ export default {
   data() {
     return {
       api: new Api('http', '110.41.3.32:8222'),
+      timer: null,
+      interval: 5 * 1000,
       version: null,
       uptime: null,
       status: null,
@@ -89,19 +91,27 @@ export default {
       port: null,
       connections: null,
       totalConnections: null,
-      connection:{
-        time:[],
-        count:[]
-      }
+      memory: null,
+      connectionChartData: {
+        time: [],
+        count: []
+      },
+      memoryChartData: {
+        time: [],
+        total: []
+      },
+      byteChartData: {
+        inByte: [],
+        outByte: []
+      },
+      messageChartData: {}
     }
   },
-  methods:{
+  methods: {
     getCurrentTime() {
       return moment().format('HH:mm:ss');
-    }
-  },
-  mounted() {
-    setInterval(async () => {
+    },
+    async freshData() {
       let result = await this.api.queryHealthProbe();
       this.status = result.status;
       result = await this.api.queryGeneral();
@@ -111,8 +121,39 @@ export default {
       this.port = result.port;
       this.connections = result.connections;
       this.totalConnections = result.total_connections;
-    }, 1000);
-    console.log(this);
+      this.memory = result.mem;
+      this.freshConnectionChart();
+    },
+    async initData() {
+      this.destroyTimer();
+      setTimeout(async ()=>{
+        await this.freshData();
+      } , 500)
+      this.timer = setInterval(async () => {
+        await this.freshData();
+      }, this.interval);
+    },
+    freshConnectionChart() {
+      this.connectionChartData.time.push(this.getCurrentTime());
+      this.connectionChartData.count.push(this.connections);
+      if (this.connectionChartData.time > 360) {
+        this.connectionChartData.time.shift();
+        this.connectionChartData.count.shift();
+      }
+      this.$refs.connectionsChart.freshChartData(this.connectionChartData.time, this.connectionChartData.count);
+    },
+    destroyTimer() {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+    }
+  },
+  mounted() {
+    this.initData();
+  },
+  beforeDestroy() {
+    this.destroyTimer();
   }
 }
 </script>
@@ -173,14 +214,14 @@ export default {
   align-items: center;
 }
 
-.monitor-dashboard-right{
+.monitor-dashboard-right {
   width: calc(88% - 10px);
   height: 100%;
   margin-left: 10px;
   border-radius: 10px;
 }
 
-.monitor-dashboard-dynamic{
+.monitor-dashboard-dynamic {
   float: left;
   width: calc(50% - 10px);
   height: calc(50% - 10px);
