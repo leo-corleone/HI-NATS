@@ -1,12 +1,60 @@
 <template>
-  <div class="monitor-memory-chart-wrap">
-    memory
+  <div class="monitor-memory-chart-wrap" id="memory-chart">
   </div>
 </template>
 
 <script>
 export default {
-  name: "MemoryChart"
+  name: "MemoryChart",
+  data(){
+    return {
+      time:[],
+      total:[],
+      title: 'Memory',
+      chart: null,
+    }
+  },
+  methods:{
+    initCharts(){
+      this.chart.setOption({
+        title: {
+          text: this.title,
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            label: {
+              backgroundColor: '#6a7985'
+            }
+          }
+        },
+        xAxis: {
+          type: 'category',
+          data: this.time
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: this.total,
+            type: 'line',
+          }
+        ]
+      });
+    },
+    freshChartData(time , total){
+      this.time = time;
+      this.total = total;
+      this.initCharts();
+    }
+  },
+  mounted() {
+    this.chart = this.$echarts.init(document.getElementById("memory-chart"));
+    this.initCharts();
+  }
 }
 </script>
 

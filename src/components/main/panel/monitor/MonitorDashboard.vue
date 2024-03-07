@@ -51,7 +51,7 @@
         <ConnectionsChart ref="connectionsChart"/>
       </div>
       <div class="monitor-dashboard-dynamic">
-        <MemoryChart/>
+        <MemoryChart ref="memoryChart"/>
       </div>
       <div class="monitor-dashboard-dynamic">
         <ByteChart/>
@@ -81,6 +81,7 @@ export default {
   },
   data() {
     return {
+      connectionId:'',
       api: new Api('http', '110.41.3.32:8222'),
       timer: null,
       interval: 5 * 1000,
@@ -102,9 +103,14 @@ export default {
       },
       byteChartData: {
         inByte: [],
-        outByte: []
+        outByte: [],
+        time:[],
       },
-      messageChartData: {}
+      messageChartData: {
+        inMsg:[],
+        outMsg:[],
+        time:[]
+      }
     }
   },
   methods: {
@@ -121,8 +127,11 @@ export default {
       this.port = result.port;
       this.connections = result.connections;
       this.totalConnections = result.total_connections;
-      this.memory = result.mem;
-      this.freshConnectionChart();
+      this.memory = result.mem / (1024);
+      this.$nextTick(()=>{
+        this.freshConnectionChart();
+        this.freshMemoryChart();
+      })
     },
     async initData() {
       this.destroyTimer();
@@ -142,15 +151,31 @@ export default {
       }
       this.$refs.connectionsChart.freshChartData(this.connectionChartData.time, this.connectionChartData.count);
     },
+    freshMemoryChart(){
+      this.memoryChartData.time.push(this.getCurrentTime());
+      this.memoryChartData.total.push(this.memory);
+      if (this.memoryChartData.time > 360) {
+        this.memoryChartData.time.shift();
+        this.memoryChartData.total.shift();
+      }
+      this.$refs.memoryChart.freshChartData(this.memoryChartData.time, this.memoryChartData.total);
+    },
     destroyTimer() {
       if (this.timer) {
         clearInterval(this.timer);
         this.timer = null;
       }
+    },
+    switchConnection(connection) {
+      if (connection.id !== this.connectionId){
+        this.api = new Api('http', `${connection.monitorHost}:${connection.monitorPort}`)
+        this.initData();
+        this.connectionId = connection.id;
+      }
     }
   },
   mounted() {
-    this.initData();
+
   },
   beforeDestroy() {
     this.destroyTimer();

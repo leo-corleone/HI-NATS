@@ -1,7 +1,7 @@
 <template>
  <div class="monitor-panel-wrap">
-   <MonitorHeader/>
-   <MonitorDashboard/>
+   <MonitorHeader :switchConnection="switchConnection"/>
+   <MonitorDashboard ref="monitorDashboard"/>
  </div>
 </template>
 
@@ -13,7 +13,12 @@ export default {
   name: "MonitorPanel",
   components:{
     MonitorHeader,
-    MonitorDashboard
+    MonitorDashboard,
+  },
+  methods:{
+    switchConnection(connection){
+      this.$refs.monitorDashboard.switchConnection(connection);
+    }
   }
 }
 </script>

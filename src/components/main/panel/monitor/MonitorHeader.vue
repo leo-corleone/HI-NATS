@@ -17,6 +17,7 @@
 <script>
 export default {
   name: "MonitorHeader",
+  props:['switchConnection'],
   data() {
     return {
       connections: JSON.parse(localStorage.getItem('connections')) || [],
@@ -25,7 +26,10 @@ export default {
   },
   methods: {
     onSubmit() {
-      console.log(this.monitorId);
+      const connection = this.connections.filter(con => con.id === this.monitorId);
+      if (connection.length > 0){
+        this.switchConnection(connection[0]);
+      }
     }
   },
   filters:{
