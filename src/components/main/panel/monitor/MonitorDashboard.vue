@@ -54,10 +54,10 @@
         <MemoryChart ref="memoryChart"/>
       </div>
       <div class="monitor-dashboard-dynamic">
-        <ByteChart/>
+        <ByteChart ref="byteChart"/>
       </div>
       <div class="monitor-dashboard-dynamic">
-        <MessagesChart/>
+        <MessagesChart ref="msgChart"/>
       </div>
     </div>
   </div>
@@ -93,6 +93,10 @@ export default {
       connections: null,
       totalConnections: null,
       memory: null,
+      inByte:null,
+      outByte:null,
+      inMsg: null,
+      outMsg:null,
       connectionChartData: {
         time: [],
         count: []
@@ -128,9 +132,15 @@ export default {
       this.connections = result.connections;
       this.totalConnections = result.total_connections;
       this.memory = result.mem / (1024);
+      this.inByte = result.in_bytes;
+      this.outByte = result.out_bytes;
+      this.inMsg = result.in_msgs;
+      this.outMsg = result.out_msgs;
       this.$nextTick(()=>{
         this.freshConnectionChart();
         this.freshMemoryChart();
+        this.freshByteChart();
+        this.freshMessageChart();
       })
     },
     async initData() {
@@ -159,6 +169,28 @@ export default {
         this.memoryChartData.total.shift();
       }
       this.$refs.memoryChart.freshChartData(this.memoryChartData.time, this.memoryChartData.total);
+    },
+    freshByteChart(){
+      this.byteChartData.time.push(this.getCurrentTime());
+      this.byteChartData.inByte.push(this.inByte);
+      this.byteChartData.outByte.push(this.outByte);
+      if (this.byteChartData.time > 360) {
+        this.byteChartData.time.shift();
+        this.byteChartData.inByte.shift();
+        this.byteChartData.outByte.shift();
+      }
+      this.$refs.byteChart.freshChartData(this.byteChartData.time, this.byteChartData.inByte , this.byteChartData.outByte);
+    },
+    freshMessageChart(){
+      this.messageChartData.time.push(this.getCurrentTime());
+      this.messageChartData.inMsg.push(this.inMsg);
+      this.messageChartData.outMsg.push(this.outMsg);
+      if (this.messageChartData.time > 360) {
+        this.messageChartData.time.shift();
+        this.messageChartData.inMsg.shift();
+        this.messageChartData.outMsg.shift();
+      }
+      this.$refs.msgChart.freshChartData(this.messageChartData.time, this.messageChartData.inMsg , this.messageChartData.outMsg);
     },
     destroyTimer() {
       if (this.timer) {
