@@ -260,7 +260,7 @@ export default {
   width: 100%;
   height: 25%;
   border-bottom: 1px solid #f1f3f1;
-  background-color: burlywood;
+  background-color: #097a64;
   color: white;
   text-align: center;
   align-items: center;
