@@ -192,6 +192,18 @@ export default {
       }
       this.$refs.msgChart.freshChartData(this.messageChartData.time, this.messageChartData.inMsg , this.messageChartData.outMsg);
     },
+    clearChart(){
+      this.memoryChartData.time = [];
+      this.memoryChartData.total = [];
+      this.byteChartData.outByte = [];
+      this.byteChartData.inByte = [];
+      this.byteChartData.time = [];
+      this.connectionChartData.time = [];
+      this.connectionChartData.count = [];
+      this.messageChartData.time = [];
+      this.messageChartData.inMsg = [];
+      this.messageChartData.outMsg = [];
+    },
     destroyTimer() {
       if (this.timer) {
         clearInterval(this.timer);
@@ -201,6 +213,7 @@ export default {
     switchConnection(connection) {
       if (connection.id !== this.connectionId){
         this.api = new Api('http', `${connection.monitorHost}:${connection.monitorPort}`)
+        this.clearChart();
         this.initData();
         this.connectionId = connection.id;
       }
