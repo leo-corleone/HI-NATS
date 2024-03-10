@@ -29,7 +29,7 @@
 > git clone url
 #### 2.install dependency
 > npm install
-#### 3. build [release](https://github.com/leo-corleone/HI-NATS/releases)
+#### 3. build [click here](https://github.com/leo-corleone/HI-NATS/releases)
 > npm run build
 #### 4. download docker nginx image
 > docker pull nginx
