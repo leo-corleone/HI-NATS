@@ -3,8 +3,8 @@
 
 <p> HI NATS is a modern lightweight Web Dashboard Tool.</p>
 
-![img.png](./screenshot/dashboard.png)
-![img_1.png](./screenshot/monitor.png)
+![./screenshot/dashboard.png](./screenshot/dashboard.png)
+![./screenshot/dashboard.png](./screenshot/monitor.png)
 
 
 ### Feature
