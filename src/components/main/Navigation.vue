@@ -17,10 +17,10 @@
             <i class="el-icon-data-line"></i>
             <span slot="title">监控</span>
           </el-menu-item>
-          <el-menu-item index="3" @click="switchCtrlPanel('logPanel')">
-            <i class="el-icon-notebook-2"></i>
-            <span slot="title">日志</span>
-          </el-menu-item>
+<!--          <el-menu-item index="3" @click="switchCtrlPanel('logPanel')">-->
+<!--            <i class="el-icon-notebook-2"></i>-->
+<!--            <span slot="title">日志</span>-->
+<!--          </el-menu-item>-->
         </el-menu>
       </el-aside>
       <el-main class="navigation-wrap-main">
