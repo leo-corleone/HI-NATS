@@ -13,8 +13,8 @@
         </div>
       </el-tooltip>
       <div class="connect-warp-ctrl">
-        <el-tooltip class="item" effect="dark" content="控制台" placement="top-start">
-          <div class="el-icon-data-board" style="color: #aeb0b2" @click.stop="ctrlDashboard"></div>
+        <el-tooltip class="item" effect="dark" content="打开控制台" placement="top-start">
+          <div class="el-icon-data-board" style="color: #409dfd" @click.stop="ctrlDashboard"></div>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" content="编辑连接" placement="top-start">
           <div class="el-icon-setting"  @click.stop="openEditConnection"></div>
