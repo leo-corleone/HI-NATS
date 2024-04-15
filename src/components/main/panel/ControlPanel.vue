@@ -29,7 +29,7 @@
    <div class="ctrl-panel-right">
      <el-tabs  v-model="tabName" type="card" closable @edit="handleTabsEdit" style="width:100%;height: 100%">
        <el-tab-pane :key="item.name" v-for="item in connectionTabs" :label="item.title" :name="item.name" style="width: 100%;height: 100%">
-         <span slot="label"><i class="el-icon-menu"></i> {{item.title}}</span>
+         <span slot="label"><i class="el-icon-data-analysis"></i> {{item.title}}</span>
          <ControlDashboard :connection="item.connection"/>
        </el-tab-pane>
      </el-tabs>
