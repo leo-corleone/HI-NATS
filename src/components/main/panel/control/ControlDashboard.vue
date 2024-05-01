@@ -26,7 +26,7 @@
         </div>
       </div>
       <div class="ctrl-view-left-subs infinite-list" style="overflow-y:auto">
-        <Subscription v-for="subscription in cacheSubscription" :key="subscription.id" :removeSubscribe="removeSubscribe" :isActive="isActive"  :subscription="subscription"/>
+        <Subscription v-for="subscription in cacheSubscription" :key="subscription.id" :removeSubscribe="removeSubscribe" :switchSubscribe="switchSubscribe" :isActive="isActive"  :subscription="subscription"/>
       </div>
     </div>
     <div class="ctrl-view-right">
@@ -140,6 +140,19 @@ export default {
       this.cacheSubscription = JSON.parse(localStorage.getItem(this.connection.id)) || [];
       return this.cacheSubscription;
     },
+    switchSubscribe(sId, isSub) {
+      let subscriptions = this.querySubjects();
+      subscriptions.forEach(subscription => {
+       if (subscription.id === sId && subscription.isSub !== isSub){
+         subscription.isSub = isSub;
+         if (isSub){
+           this.subscribe(subscription);
+         }else {
+           this.unSubscribe(subscription);
+         }
+       }
+      });
+    },
     subscription(){
       let subscriptions = this.querySubjects();
       subscriptions.forEach(subscription => {
@@ -158,20 +171,26 @@ export default {
       return true;
     },
     subscribe(subscription){
-      this.mq.sub(subscription.topic , (data ,msg) => {
-        this.renderChatWindow(msg.subject ,'sub' ,data);
-      })
+      if (subscription.isSub){
+        this.mq.sub(subscription.topic , (data ,msg) => {
+          this.renderChatWindow(msg.subject ,'sub' ,data);
+        })
+      }
     },
     removeSubscribe(subscription){
+      this.unSubscribe(subscription);
+      this.cacheSubscription = this.cacheSubscription.filter(sub => sub.id !== subscription.id);
+    },
+    unSubscribe(subscription){
       this.cacheSubscription = this.querySubjects();
       if (this.isActive){
         this.cacheSubscription.forEach(sub => {
           if (sub.id === subscription.id){
             this.mq.unsub(subscription.topic);
+            sub.isSub = false;
           }
         });
       }
-      this.cacheSubscription = this.cacheSubscription.filter(sub => sub.id !== subscription.id);
     },
     clearSubscribe(){
       this.cacheSubscription = this.querySubjects();

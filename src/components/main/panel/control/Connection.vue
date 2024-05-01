@@ -7,7 +7,7 @@
       <div class="connect-warp-icon" :style="this.connection.id === this.selectedConnection ? 'color:green' : 'color:red'">
           <i class="el-icon-cloudy"></i>
       </div>
-      <el-tooltip class="item" effect="dark" :content="contentToolTip" placement="left-end">
+      <el-tooltip class="item" effect="dark" :content="contentToolTip" placement="top">
         <div class="connect-warp-content ellipsis el-badge">
           {{ connection.name }}@{{ connection.host }}:{{ connection.port }}
         </div>
@@ -80,11 +80,11 @@ export default {
   height: 33px;
   line-height: 33px;
   border-radius: 10px;
-  background-color: rgba(225, 214, 214, 0.5);
+  background-color: rgb(243 248 254);
 }
 
 .connect-warp-outer:hover {
-  background-color: rgba(225, 214, 214, 0.95);
+  background-color: rgb(210 219 229 / 99%);
 }
 
 .connect-warp-outer div {
@@ -104,6 +104,9 @@ export default {
   width: calc(50% - 10px);
   margin: 0 auto 0 2px;
   overflow: hidden;
+  font-size: small;
+  color: #87c6af;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
 }
 
 .connect-warp-ctrl {

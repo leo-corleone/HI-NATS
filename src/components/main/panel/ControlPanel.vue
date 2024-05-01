@@ -13,7 +13,7 @@
            class="ctrl-panel-tool-input"
            :disabled="inputDisabled">
        </el-input>
-       <el-button @click="openConnectionDialog" size="mini" icon="el-icon-plus" type="primary" round></el-button>
+       <el-button @click="openConnectionDialog" size="mini" icon="el-icon-plus" type="primary" plain></el-button>
      </div>
      <div class="ctrl-panel-left-bottom">
        <Connection :ref="conn.id"  v-for="conn in connections"
@@ -181,9 +181,10 @@ export default {
   }
 
   .ctrl-panel-left-bottom{
-    width: 100%;
+    width: 95%;
     height: auto;
     padding: 5px 0;
+    margin: 0 calc(2.5%);
   }
 
   .ctrl-panel-left-bottom > div{
