@@ -2,12 +2,15 @@
     <div class="subscription-warp"
          @mouseover="hover = true"
          @mouseleave="hover = false"
+         @click="copyTopic"
          :style="{'border-radius': '10px','background-color':`${subscription.color}1a`}">
       <span class="ellipsis subscription-ident" :style="'background-color:' + subscription.color"></span>
       <span class="ellipsis subscription-content"
             :style=" 'color:' + subscription.color">{{ subscription.topic }}</span>
       <span>
-        <el-checkbox :disabled="!isActive" type="success"  size="mini" circle :checked="subscription.isSub" @change="changeSubscribe(subscription.id ,!subscription.isSub)" ></el-checkbox>
+        <el-checkbox :disabled="!isActive" type="success"  size="mini" circle :checked="subscription.isSub"
+                     @change="changeSubscribe(subscription.id ,!subscription.isSub)"
+                     @click.stop.native="()=>{}"></el-checkbox>
       </span>
       <span class="subscription-remove el-icon-minus" v-if="hover" @click="removeSubscription"></span>
     </div>
@@ -23,6 +26,14 @@ export default {
     }
   },
   methods: {
+    copyTopic(){
+      this.$copyText(this.subscription.topic).then(() => {
+        this.$notify.success('复制成功');
+      } , (e) => {
+        this.$notify.success('复制失败');
+        console.log(e);
+      });
+    },
     removeSubscription() {
       this.removeSubscribe(this.subscription);
     },
