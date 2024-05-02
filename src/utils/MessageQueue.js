@@ -1,4 +1,4 @@
-import {connect, JSONCodec, StringCodec, ErrorCode, NatsError} from "nats.ws";
+import {connect, ErrorCode, JSONCodec, NatsError, StringCodec} from "nats.ws";
 
 
 class MessageQueue {

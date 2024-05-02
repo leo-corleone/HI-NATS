@@ -21,12 +21,14 @@
                      @click="switchConnect"
                      :type="isActive ? 'danger' : 'success'"
                      size="mini"
-                     plain> {{isActive ? '断开连接' : '连接'}}
+                     plain> {{ isActive ? '断开连接' : '连接' }}
           </el-button>
         </div>
       </div>
       <div class="ctrl-view-left-subs infinite-list" style="overflow-y:auto">
-        <Subscription v-for="subscription in cacheSubscription" :key="subscription.id" :removeSubscribe="removeSubscribe" :switchSubscribe="switchSubscribe" :isActive="isActive"  :subscription="subscription"/>
+        <Subscription v-for="subscription in cacheSubscription" :key="subscription.id"
+                      :removeSubscribe="removeSubscribe" :switchSubscribe="switchSubscribe" :isActive="isActive"
+                      :subscription="subscription"/>
       </div>
     </div>
     <div class="ctrl-view-right">
@@ -83,7 +85,7 @@ export default {
     changeLoadingState(bool = false) {
       this.loading = bool;
     },
-    changeActiveState(bool = false){
+    changeActiveState(bool = false) {
       this.isActive = bool;
     },
     async switchConnect() {
@@ -116,8 +118,8 @@ export default {
       await this.mq.close();
       this.changeActiveState();
     },
-    listenConnection(status){
-      switch (status.type){
+    listenConnection(status) {
+      switch (status.type) {
         case 'pingTimer':
           this.changeActiveState(true);
           this.changeLoadingState(false);
@@ -143,26 +145,26 @@ export default {
     switchSubscribe(sId, isSub) {
       let subscriptions = this.querySubjects();
       subscriptions.forEach(subscription => {
-       if (subscription.id === sId && subscription.isSub !== isSub){
-         subscription.isSub = isSub;
-         if (isSub){
-           this.subscribe(subscription);
-         }else {
-           this.unSubscribe(subscription);
-         }
-       }
+        if (subscription.id === sId && subscription.isSub !== isSub) {
+          subscription.isSub = isSub;
+          if (isSub) {
+            this.subscribe(subscription);
+          } else {
+            this.unSubscribe(subscription);
+          }
+        }
       });
     },
-    subscription(){
+    subscription() {
       let subscriptions = this.querySubjects();
       subscriptions.forEach(subscription => {
         this.subscribe(subscription);
       });
     },
-    addSubscribe(subscription){
+    addSubscribe(subscription) {
       let subscriptions = this.querySubjects().filter(sub => sub.topic === subscription.topic);
-      if (subscriptions.length > 0){
-        this.$notify.error({title:'错误' ,message:`主题[${subscription.topic}]已订阅`})
+      if (subscriptions.length > 0) {
+        this.$notify.error({title: '错误', message: `主题[${subscription.topic}]已订阅`})
         return false;
       }
       subscription.id = nanoid();
@@ -170,74 +172,90 @@ export default {
       this.subscribe(subscription);
       return true;
     },
-    subscribe(subscription){
-      if (subscription.isSub){
-        this.mq.sub(subscription.topic , (data ,msg) => {
-          this.renderChatWindow(msg.subject ,'sub' ,data);
+    subscribe(subscription) {
+      if (subscription.isSub) {
+        this.mq.sub(subscription.topic, (data, msg) => {
+          this.renderChatWindow({
+            topic: msg.subject,
+            type: 'sub',
+            data,
+            color: subscription.color
+          });
         })
       }
     },
-    removeSubscribe(subscription){
+    removeSubscribe(subscription) {
       this.unSubscribe(subscription);
       this.cacheSubscription = this.cacheSubscription.filter(sub => sub.id !== subscription.id);
     },
-    unSubscribe(subscription){
+    unSubscribe(subscription) {
       this.cacheSubscription = this.querySubjects();
-      if (this.isActive){
+      if (this.isActive) {
         this.cacheSubscription.forEach(sub => {
-          if (sub.id === subscription.id){
+          if (sub.id === subscription.id) {
             this.mq.unsub(subscription.topic);
             sub.isSub = false;
           }
         });
       }
     },
-    clearSubscribe(){
+    clearSubscribe() {
       this.cacheSubscription = this.querySubjects();
-      if (this.isActive){
+      if (this.isActive) {
         this.cacheSubscription.forEach(sub => {
-            this.mq.unsub(sub.topic);
+          this.mq.unsub(sub.topic);
         });
       }
       this.cacheSubscription = [];
     },
     publish(publication, cb) {
-      if (!this.isActive){
+      if (!this.isActive) {
         cb && cb();
-        this.$notify.error({title:'错误' ,message:'客户端未连接'});
+        this.$notify.error({title: '错误', message: '客户端未连接'});
         return
       }
-      this.mq.pub(publication.topic , publication.data);
-      this.renderChatWindow(publication.topic, publication.type, publication.data);
+      this.mq.pub(publication.topic, publication.data);
+      this.renderChatWindow({
+        topic: publication.topic,
+        type: publication.type,
+        data: publication.data,
+        color: publication.color
+      });
       cb && cb();
     },
     async request(request, cb) {
-      if (!this.isActive){
+      if (!this.isActive) {
         cb && cb();
-        this.$notify.error({title:'错误' ,message:'客户端未连接'});
+        this.$notify.error({title: '错误', message: '客户端未连接'});
         return
       }
-      let result = await this.mq.req(request.topic , request.data);
+      let result = await this.mq.req(request.topic, request.data);
       cb && cb();
       if (result instanceof Error) {
         result = this.mq.error(result);
-        this.$notify.error({title:"错误" , message: result.message});
+        this.$notify.error({title: "错误", message: result.message});
         return;
       }
-      this.renderChatWindow(request.topic, request.type, result);
+      this.renderChatWindow({
+        topic: request.topic,
+        type: request.type,
+        data: result,
+        color: request.color
+      });
     },
-    renderChatWindow(topic, type, data) {
+    renderChatWindow(renderData) {
       let chatRecord = {
         id: nanoid(),
-        data: data,
-        type: type,
-        topic: topic,
+        data: renderData.data,
+        type: renderData.type,
+        topic: renderData.topic,
+        color: renderData.color,
         time: this.getCurrentTime(),
       }
       this.pushRecord(chatRecord);
       this.refreshScrollView();
     },
-    clearChatWindow(){
+    clearChatWindow() {
       this.chatRecords = [];
     },
     pushRecord(record) {

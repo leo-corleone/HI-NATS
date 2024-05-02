@@ -2,8 +2,8 @@
   <div class="ctrl-request-record-warp">
     <span class="ctrl-request-record-content">
      <div class="ctrl-request-content-outer">
-       <span style="max-width: 70%">
-         <div class="ctrl-request-content-topic">
+       <span style="max-width: 70%" :style="{'background-color': `${record.color}1a` ,'color': record.color}">
+         <div class="ctrl-request-content-topic" :style="{'background-color': `${record.color}1a` ,'color': record.color}" >
            <div class="el-icon-s-promotion">
              <span class="ctrl-request-record-topic">{{record.topic}}</span>
            </div>
@@ -100,7 +100,6 @@ export default {
 }
 
 .ctrl-request-bottom-copy{
-  color: green;
   padding: 2px;
   font-size: 12px;
 }

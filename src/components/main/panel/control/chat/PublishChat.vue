@@ -2,8 +2,8 @@
   <div class="ctrl-publish-record-warp">
     <span class="ctrl-publish-record-content">
      <div class="ctrl-publish-content-outer">
-       <span style="max-width: 70%">
-         <div class="ctrl-publish-content-topic">
+       <span style="max-width: 70%" :style="{'background-color': `${record.color}1a` ,'color': record.color}">
+         <div class="ctrl-publish-content-topic" >
            <div class="el-icon-position">
              <span class="ctrl-publish-record-topic">{{record.topic}}</span>
            </div>
@@ -100,7 +100,6 @@ export default {
 }
 
 .ctrl-publish-bottom-copy{
-  color: green;
   padding: 2px;
   font-size: 12px;
 }

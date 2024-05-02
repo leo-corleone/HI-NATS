@@ -38,6 +38,7 @@ export default {
         topic:'',
         type:'pub',
         data:'',
+        color: null
       },
       loading:false
     }
@@ -53,10 +54,12 @@ export default {
       }
       this.changeState(true);
       if (this.publication.type === 'req'){
+        this.publication.color = '#e7a75e';
         this.request(this.publication , ()=>{
           this.changeState();
         })
       }else {
+        this.publication.color = '#f56c6c';
         this.publish(this.publication , ()=>{
           this.changeState();
         });

@@ -1,17 +1,17 @@
 <template>
-  <div class="ctrl-subscription-record-warp">
-    <div class="ctrl-subscription-record-content">
-     <span style="max-width: 70%">
+  <div class="ctrl-subscription-record-warp" >
+    <div class="ctrl-subscription-record-content" >
+     <span style="max-width: 70%" :style="{'background-color': `${record.color}1a` ,'color': record.color}">
         <div class="ctrl-subscription-inner">
-          <span class="el-icon-collection-tag">
-            <span class="ctrl-subscription-topic">{{record.topic}}</span>
+          <span class="el-icon-collection-tag" :style="{'background-color': `${record.color}1a`}">
+            <span class="ctrl-subscription-topic" :style="{'background-color': `${record.color}1a`}">{{record.topic}}</span>
           </span>
           <div class="ctrl-subscription-content">
             {{record.data}}
           </div>
         </div>
         <el-divider></el-divider>
-        <div class="ctrl-subscription-record-bottom">
+        <div class="ctrl-subscription-record-bottom" :style="{'background-color': `${record.color}1a` ,'color': record.color}">
           <div class="ctrl-subscription-bottom-time">{{record.time}}</div>
           <div @click="copy" class="ctrl-subscription-bottom-copy el-icon-copy-document"></div>
         </div>
@@ -43,6 +43,9 @@ export default {
         time: this.record.time
       };
     }
+  },
+  mounted() {
+    // console.log(this.record)
   }
 }
 </script>
@@ -94,7 +97,6 @@ export default {
   }
 
   .ctrl-subscription-bottom-copy{
-    color: green;
     padding: 2px;
   }
 
