@@ -85,6 +85,7 @@ export default {
 
 /deep/ .el-divider--horizontal{
   margin: 2px 0;
+  background-color: #fdfdfd;
 }
 
 .ctrl-publish-record-topic{

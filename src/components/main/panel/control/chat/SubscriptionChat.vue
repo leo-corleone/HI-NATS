@@ -86,6 +86,7 @@ export default {
 
   /deep/ .el-divider--horizontal{
     margin: 2px 0;
+    background-color: #fdfdfd;
   }
 
   .ctrl-subscription-record-bottom div{
